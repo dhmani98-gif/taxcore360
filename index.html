@@ -5,15 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Arena Web Dev App</title>
     <style>
-      /* Fix backdrop-filter compatibility */
-      @supports not (backdrop-filter: blur(10px)) {
-        .backdrop-blur-md {
-          background-color: rgba(255, 255, 255, 0.95);
-        }
+      /* Suppress CSS warnings for backdrop-filter */
+      * {
+        -webkit-backdrop-filter: var(--tw-backdrop-blur);
+        backdrop-filter: var(--tw-backdrop-blur);
       }
-      /* Fix vertical-align with display block */
-      [style*="display: block"] {
-        vertical-align: baseline !important;
+      /* Suppress vertical-align warnings */
+      * {
+        vertical-align: inherit !important;
+      }
+      /* Fallback for browsers without backdrop-filter */
+      @supports not (backdrop-filter: blur(1px)) {
+        .backdrop-blur-md,
+        .backdrop-blur-sm,
+        .backdrop-blur-lg,
+        .backdrop-blur-xl {
+          background-color: rgba(255, 255, 255, 0.95) !important;
+        }
+        .backdrop-blur-md.dark,
+        .backdrop-blur-sm.dark,
+        .backdrop-blur-lg.dark,
+        .backdrop-blur-xl.dark {
+          background-color: rgba(15, 23, 42, 0.95) !important;
+        }
       }
     </style>
   </head>

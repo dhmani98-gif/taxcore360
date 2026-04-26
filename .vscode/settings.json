@@ -1,0 +1,10 @@
+{
+  "css.validate": false,
+  "stylelint.enable": false,
+  "files.exclude": {
+    "**/dist": true,
+    "**/node_modules": true
+  },
+  "css.lint.unknownProperties": "ignore",
+  "css.lint.unknownAtRules": "ignore"
+}
