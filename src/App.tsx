@@ -112,7 +112,7 @@ const dashboardCardClassName = (variant: CardVariant) =>
   );
 
 function App() {
-  const { user: supabaseUser, loading: authLoading, signIn, signUp, signOut, resetPassword } = useAuth();
+  const { user: supabaseUser, loading: authLoading, signIn, signUp, signOut, resetPassword, signInWithOAuth } = useAuth();
   
   const activeCompanyId = companyOptions[0]?.id ?? "TC360-HQ";
   const defaultYear = payrollMonthOptions[0]?.split("-")[0] ?? String(new Date().getFullYear());
@@ -2622,7 +2622,7 @@ function App() {
 
   const handleSocialLogin = async (provider: string) => {
     const providerLower = provider.toLowerCase() as 'google' | 'microsoft' | 'apple' | 'github';
-    const result = await authService.signInWithOAuth(providerLower);
+    const result = await signInWithOAuth(providerLower);
     
     if (!result.success) {
       setAuthMessage(result.error || `Failed to sign in with ${provider}`);
