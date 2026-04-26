@@ -93,7 +93,7 @@ export const authService = {
       
       const timeoutId = setTimeout(() => {
         console.error('Auth call timed out after 8 seconds');
-        authError = new Error('Authentication timeout - Supabase did not respond. Try using demo@example.com with password "demo123" for demo mode.');
+        authError = new Error('Authentication timeout - Please check your internet connection and try again.');
       }, 8000);
       
       try {
