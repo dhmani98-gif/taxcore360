@@ -3,6 +3,7 @@ import { PDFDocument, PDFDropdown, PDFOptionList, PDFTextField } from "pdf-lib";
 import type * as React from "react";
 import { useMemo, useState, useEffect } from "react";
 import type { Dispatch, SetStateAction } from "react";
+import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import { supabaseEmployeeService } from "./services/supabaseEmployeeService";
 import { supabaseVendorService } from "./services/supabaseVendorService";
@@ -113,6 +114,8 @@ const dashboardCardClassName = (variant: CardVariant) =>
 
 function App() {
   const { user: supabaseUser, loading: authLoading, signIn, signUp, signOut, resetPassword, signInWithOAuth } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   
   const activeCompanyId = companyOptions[0]?.id ?? "TC360-HQ";
   const defaultYear = payrollMonthOptions[0]?.split("-")[0] ?? String(new Date().getFullYear());
