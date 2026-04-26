@@ -67,15 +67,15 @@ export const authService = {
   },
 
   // Demo mode flag - set to true for offline development
-  isDemoMode: true, // ENABLED - Supabase connection has timeout issues
+  isDemoMode: false, // DISABLED - Production mode requires real authentication
 
   // Sign in existing user
   signIn: async (email: string, password: string): Promise<AuthResult> => {
     try {
       console.log('Starting sign in for:', email);
       
-      // DEMO MODE: Enabled - Supabase connection has timeout issues
-      if (authService.isDemoMode || email.includes('demo@') || password === 'demo123') {
+      // DEMO MODE: Disabled - Only real authentication allowed
+      if (authService.isDemoMode) {
         console.log('Using DEMO authentication mode');
         const demoUser: AuthUser = {
           id: 'demo-' + Date.now(),
