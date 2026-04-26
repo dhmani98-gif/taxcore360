@@ -2620,9 +2620,15 @@ function App() {
     }
   };
 
-  const handleSocialLogin = (provider: string) => {
-    setAuthMessage(`${provider} SSO is ready. Connect your OAuth keys to enable live authentication.`);
-    setAuthMessageType("info");
+  const handleSocialLogin = async (provider: string) => {
+    const providerLower = provider.toLowerCase() as 'google' | 'microsoft' | 'apple' | 'github';
+    const result = await authService.signInWithOAuth(providerLower);
+    
+    if (!result.success) {
+      setAuthMessage(result.error || `Failed to sign in with ${provider}`);
+      setAuthMessageType("error");
+    }
+    // If successful, Supabase will redirect to the OAuth provider
   };
 
   const handleQuickBooksConnect = () => {

@@ -240,6 +240,28 @@ export const authService = {
     }
   },
 
+  // Sign in with OAuth (Google, Microsoft, etc.)
+  signInWithOAuth: async (provider: 'google' | 'microsoft' | 'apple' | 'github'): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) throw error;
+
+      return { success: true };
+    } catch (error) {
+      const authError = error as AuthError;
+      return {
+        success: false,
+        error: authError.message || `Failed to sign in with ${provider}`,
+      };
+    }
+  },
+
   // Listen to auth state changes
   onAuthStateChange: (callback: (user: AuthUser | null) => void) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
