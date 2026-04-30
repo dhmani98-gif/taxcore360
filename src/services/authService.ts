@@ -93,7 +93,7 @@ export const authService = {
       
       const timeoutId = setTimeout(() => {
         console.error('Auth call timed out after 8 seconds');
-        authError = new Error('Authentication timeout - Please check your internet connection and try again.');
+        authError = new Error('Unable to connect to authentication server. Please check your internet connection and try again.');
       }, 8000);
       
       try {
