@@ -3,6 +3,7 @@ import { PDFDocument, PDFDropdown, PDFOptionList, PDFTextField } from "pdf-lib";
 import type * as React from "react";
 import { useMemo, useState, useEffect } from "react";
 import type { Dispatch, SetStateAction } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import { supabaseEmployeeService } from "./services/supabaseEmployeeService";
 import { supabaseVendorService } from "./services/supabaseVendorService";
@@ -112,6 +113,8 @@ const dashboardCardClassName = (variant: CardVariant) =>
   );
 
 function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { user: supabaseUser, loading: authLoading, signIn, signUp, signOut, resetPassword, signInWithOAuth } = useAuth();
   
   const activeCompanyId = companyOptions[0]?.id ?? "TC360-HQ";
@@ -119,25 +122,12 @@ function App() {
   const defaultPayrollMonth = payrollMonthOptions[0] ?? `${defaultYear}-01`;
 
   const [authScreen, setAuthScreen] = useState<AuthScreenType>(() => {
-    // Check URL hash to determine initial screen
-    if (window.location.hash === '#signin') return 'signin';
-    if (window.location.hash === '#register') return 'register';
-    if (window.location.hash === '#forgot') return 'forgot';
-    return 'welcome';
+    const path = window.location.pathname;
+    if (path.startsWith("/auth/signin") || path.startsWith("/login")) return "signin";
+    if (path.startsWith("/auth/register")) return "register";
+    if (path.startsWith("/auth/forgot")) return "forgot";
+    return "welcome";
   });
-
-  // Listen for hash changes
-  useEffect(() => {
-    const handleHashChange = () => {
-      if (window.location.hash === '#signin') setAuthScreen('signin');
-      else if (window.location.hash === '#register') setAuthScreen('register');
-      else if (window.location.hash === '#forgot') setAuthScreen('forgot');
-      else setAuthScreen('welcome');
-    };
-
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [registerForm, setRegisterForm] = useState({ name: "", email: "", password: "" });
   const [forgotEmail, setForgotEmail] = useState("");
@@ -187,6 +177,126 @@ function App() {
       });
     }
   }, [supabaseUser]);
+
+  const getPathForAppState = (nextViewMode: ViewMode, nextPortalSection: PortalSection, nextW2Section: W2Section) => {
+    if (nextViewMode === "executive") return "/dashboard";
+    if (nextViewMode === "employee") return "/employees";
+    if (nextViewMode === "payroll") return "/payroll";
+    if (nextViewMode === "w2") return nextW2Section === "summary" ? "/w2/summary" : "/w2/forms";
+    if (nextViewMode === "portal") {
+      if (nextPortalSection === "dashboard") return "/portal";
+      if (nextPortalSection === "vendors") return "/vendors";
+      return `/portal/${nextPortalSection}`;
+    }
+    if (nextViewMode === "reports") return "/reports";
+    if (nextViewMode === "settings") return "/settings";
+    if (nextViewMode === "subscriptions") return "/subscriptions";
+    if (nextViewMode === "tasks") return "/tasks";
+    if (nextViewMode === "documents") return "/documents";
+    return "/dashboard";
+  };
+
+  const getAuthPathForScreen = (screen: AuthScreenType) => {
+    if (screen === "signin") return "/auth/signin";
+    if (screen === "register") return "/auth/register";
+    if (screen === "forgot") return "/auth/forgot";
+    return "/";
+  };
+
+  useEffect(() => {
+    const path = location.pathname;
+
+    if (!supabaseUser) {
+      if (path.startsWith("/auth/signin") || path === "/login") {
+        if (authScreen !== "signin") setAuthScreen("signin");
+      } else if (path.startsWith("/auth/register")) {
+        if (authScreen !== "register") setAuthScreen("register");
+      } else if (path.startsWith("/auth/forgot")) {
+        if (authScreen !== "forgot") setAuthScreen("forgot");
+      } else {
+        if (authScreen !== "welcome") setAuthScreen("welcome");
+      }
+      return;
+    }
+
+    if (path === "/" || path === "/dashboard") {
+      if (viewMode !== "executive") setViewMode("executive");
+      return;
+    }
+    if (path.startsWith("/employees")) {
+      if (viewMode !== "employee") setViewMode("employee");
+      return;
+    }
+    if (path.startsWith("/payroll")) {
+      if (viewMode !== "payroll") setViewMode("payroll");
+      return;
+    }
+    if (path.startsWith("/vendors")) {
+      if (viewMode !== "portal") setViewMode("portal");
+      if (portalSection !== "vendors") setPortalSection("vendors");
+      return;
+    }
+    if (path.startsWith("/w2/summary")) {
+      if (viewMode !== "w2") setViewMode("w2");
+      if (w2Section !== "summary") setW2Section("summary");
+      return;
+    }
+    if (path.startsWith("/w2")) {
+      if (viewMode !== "w2") setViewMode("w2");
+      if (w2Section !== "form") setW2Section("form");
+      return;
+    }
+    if (path.startsWith("/portal")) {
+      const parts = path.split("/").filter(Boolean);
+      const section = (parts[1] as PortalSection | undefined) || "dashboard";
+      if (viewMode !== "portal") setViewMode("portal");
+      if (portalSection !== section) setPortalSection(section);
+      return;
+    }
+    if (path.startsWith("/reports")) {
+      if (viewMode !== "reports") setViewMode("reports");
+      return;
+    }
+    if (path.startsWith("/settings")) {
+      if (viewMode !== "settings") setViewMode("settings");
+      return;
+    }
+    if (path.startsWith("/subscriptions")) {
+      if (viewMode !== "subscriptions") setViewMode("subscriptions");
+      return;
+    }
+    if (path.startsWith("/tasks")) {
+      if (viewMode !== "tasks") setViewMode("tasks");
+      return;
+    }
+    if (path.startsWith("/documents")) {
+      if (viewMode !== "documents") setViewMode("documents");
+      return;
+    }
+  }, [location.pathname, supabaseUser, authScreen, viewMode, portalSection, w2Section]);
+
+  const setViewModeWithRoute: Dispatch<SetStateAction<ViewMode>> = (next) => {
+    const resolved = typeof next === "function" ? next(viewMode) : next;
+    setViewMode(resolved);
+    navigate(getPathForAppState(resolved, portalSection, w2Section));
+  };
+
+  const setPortalSectionWithRoute: Dispatch<SetStateAction<PortalSection>> = (next) => {
+    const resolved = typeof next === "function" ? next(portalSection) : next;
+    setPortalSection(resolved);
+    navigate(getPathForAppState(viewMode === "portal" ? viewMode : "portal", resolved, w2Section));
+  };
+
+  const setW2SectionWithRoute: Dispatch<SetStateAction<W2Section>> = (next) => {
+    const resolved = typeof next === "function" ? next(w2Section) : next;
+    setW2Section(resolved);
+    navigate(getPathForAppState(viewMode === "w2" ? viewMode : "w2", portalSection, resolved));
+  };
+
+  const goToAuthScreen = (screen: AuthScreenType) => {
+    setAuthScreen(screen);
+    navigate(getAuthPathForScreen(screen));
+  };
 
   const [vendors, setVendors] = useState<VendorRow[]>(
     initialVendors.map((vendor) => ({ ...vendor, companyId: vendor.companyId ?? activeCompanyId })),
@@ -2703,7 +2813,7 @@ function App() {
   const handleLogout = async () => {
     await signOut();
     setLoginForm((prev) => ({ ...prev, password: "" }));
-    setAuthScreen("welcome");
+    goToAuthScreen("welcome");
   };
 
   const handleSaveSettings = (event: React.FormEvent<HTMLFormElement>) => {
@@ -2728,7 +2838,7 @@ function App() {
   if (!supabaseUser) {
     // Show landing page if on welcome screen
     if (authScreen === "welcome") {
-      return <LandingPage onNavigateToAuth={(screen) => setAuthScreen(screen)} />;
+      return <LandingPage onNavigateToAuth={(screen) => goToAuthScreen(screen)} />;
     }
     
     // Show auth screen for signin/register/forgot
@@ -2747,14 +2857,14 @@ function App() {
         registerError={authMessageType === "error" ? authMessage : ""}
         isAuthenticating={isAuthenticating}
         onPrepareSignIn={() => {
-          setAuthScreen("signin");
+          goToAuthScreen("signin");
           setAuthMessage("");
         }}
         onPrepareRegister={() => {
-          setAuthScreen("register");
+          goToAuthScreen("register");
           setAuthMessage("");
         }}
-        onScreenChange={setAuthScreen}
+        onScreenChange={goToAuthScreen}
         onLoginFormChange={(field: string, value: string) => setLoginForm((prev) => ({ ...prev, [field]: value }))}
         onRegisterFormChange={(field: string, value: string) => setRegisterForm((prev) => ({ ...prev, [field]: value }))}
         onMfaCodeChange={() => {}}
@@ -2882,9 +2992,9 @@ function App() {
           isPortalOpen={isPortalOpen}
           isTasksOpen={isTasksOpen}
           isDocumentsOpen={isDocumentsOpen}
-          setViewMode={setViewMode}
-          setPortalSection={setPortalSection}
-          setW2Section={setW2Section}
+          setViewMode={setViewModeWithRoute}
+          setPortalSection={setPortalSectionWithRoute}
+          setW2Section={setW2SectionWithRoute}
           setIsWorkforceOpen={setIsWorkforceOpen}
           setIsW2Open={setIsW2Open}
           setIsPortalOpen={setIsPortalOpen}
@@ -2893,6 +3003,7 @@ function App() {
           onOpenReports={() => {
             setViewMode("reports");
             setReportFocus(null);
+            navigate("/reports");
           }}
           onLogout={handleLogout}
         />

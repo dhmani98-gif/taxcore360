@@ -9,7 +9,7 @@ interface AppRoutesProps {
   loading: boolean;
 }
 
-export function AppRoutes({ user, loading }: AppRoutesProps) {
+export function AppRoutes({ user: _user, loading }: AppRoutesProps) {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -28,10 +28,17 @@ export function AppRoutes({ user, loading }: AppRoutesProps) {
       <Route path="/payroll" element={<App />} />
       <Route path="/vendors" element={<App />} />
       <Route path="/w2" element={<App />} />
+      <Route path="/w2/forms" element={<App />} />
+      <Route path="/w2/summary" element={<App />} />
       <Route path="/portal" element={<App />} />
+      <Route path="/portal/*" element={<App />} />
       <Route path="/reports" element={<App />} />
       <Route path="/settings" element={<App />} />
+      <Route path="/subscriptions" element={<App />} />
+      <Route path="/tasks" element={<App />} />
+      <Route path="/documents" element={<App />} />
       <Route path="/login" element={<App />} />
+      <Route path="/auth/*" element={<App />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
