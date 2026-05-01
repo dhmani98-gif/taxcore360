@@ -4,6 +4,15 @@ builder = "nixpacks"
 [build.nixpacksConfig]
 nodeVersion = "20"
 
+# Caddy configuration for SPA routing
+[build.nixpacksConfig.caddyfile]
+content = """
+:{$PORT}
+root * /app/dist
+try_files {path} /index.html
+file_server
+"""
+
 [deploy]
 healthcheckPath = "/"
 healthcheckTimeout = 100
