@@ -27,9 +27,7 @@ export const reportTypeOptions: Array<{ key: ReportFocus; title: string; text: s
 ];
 
 export const companyOptions = [
-  { id: "TC360-HQ", name: "TaxCore360 Holdings LLC", ein: "12-3456789" },
-  { id: "NORTH-STAR", name: "North Star Services Inc", ein: "81-2233445" },
-  { id: "SUNSET-OPS", name: "Sunset Operations Group", ein: "92-9876543" },
+  { id: "DEFAULT", name: "", ein: "" },
 ] as const;
 
 export const filingLifecycleOptions: FilingLifecycleStatus[] = ["Not Started", "Draft", "Submitted", "Accepted", "Rejected"];
@@ -37,142 +35,13 @@ export const payrollMonthOptions = ["2026-01", "2026-02", "2026-03", "2026-04", 
 export const executiveChartPalette = ["#4f74b9", "#5b61ff", "#2f65de", "#8da5cc", "#26446f", "#f39b3a"];
 
 export const employeeCards = [
-  { title: "TOTAL EMPLOYEES", value: "248", variant: "default" as CardVariant },
-  { title: "ACTIVE PAYROLL", value: "$742,600.00", variant: "accent" as CardVariant },
-  { title: "AVG MONTHLY WAGE", value: "$2,994.35", variant: "default" as CardVariant },
-  { title: "FLAGGED VARIANCES", value: "06", variant: "dark" as CardVariant },
+  { title: "TOTAL EMPLOYEES", value: "0", variant: "default" as CardVariant },
+  { title: "ACTIVE PAYROLL", value: "$0.00", variant: "accent" as CardVariant },
+  { title: "AVG MONTHLY WAGE", value: "$0.00", variant: "default" as CardVariant },
+  { title: "FLAGGED VARIANCES", value: "0", variant: "dark" as CardVariant },
 ];
 
-export const initialEmployeeRows: EmployeeRow[] = [
-  {
-    id: 1,
-    firstName: "John",
-    lastName: "Smith",
-    fullName: "John Smith",
-    ssn: "100-11-1111",
-    address: "100 Main Street",
-    city: "Los Angeles",
-    state: "Delaware",
-    zipCode: "90001",
-    department: "Sales",
-    jobTitle: "Manager",
-    hireDate: "07/19/2023",
-    grossPay: 9850,
-    status: "Active",
-  },
-  {
-    id: 2,
-    firstName: "Sarah",
-    lastName: "Johnson",
-    fullName: "Sarah Johnson",
-    ssn: "100-22-2222",
-    address: "200 Main Street",
-    city: "New York",
-    state: "New York",
-    zipCode: "90002",
-    department: "Marketing",
-    jobTitle: "Director",
-    hireDate: "09/13/2024",
-    grossPay: 11430,
-    status: "Active",
-  },
-  {
-    id: 3,
-    firstName: "Michael",
-    lastName: "Williams",
-    fullName: "Michael Williams",
-    ssn: "100-33-3333",
-    address: "300 Main Street",
-    city: "Chicago",
-    state: "Illinois",
-    zipCode: "90003",
-    department: "IT",
-    jobTitle: "Analyst",
-    hireDate: "05/30/2022",
-    grossPay: 8240,
-    status: "Active",
-  },
-  {
-    id: 4,
-    firstName: "Jennifer",
-    lastName: "Brown",
-    fullName: "Jennifer Brown",
-    ssn: "100-44-4444",
-    address: "400 Main Street",
-    city: "Houston",
-    state: "Texas",
-    zipCode: "90004",
-    department: "Finance",
-    jobTitle: "Specialist",
-    hireDate: "12/26/2025",
-    grossPay: 10100,
-    status: "Active",
-  },
-  {
-    id: 5,
-    firstName: "David",
-    lastName: "Jones",
-    fullName: "David Jones",
-    ssn: "100-55-5555",
-    address: "500 Main Street",
-    city: "Phoenix",
-    state: "Arizona",
-    zipCode: "90005",
-    department: "HR",
-    jobTitle: "Coordinator",
-    hireDate: "04/06/2022",
-    grossPay: 7680,
-    status: "Active",
-  },
-  {
-    id: 6,
-    firstName: "Lisa",
-    lastName: "Garcia",
-    fullName: "Lisa Garcia",
-    ssn: "100-66-6666",
-    address: "600 Main Street",
-    city: "Philadelphia",
-    state: "Pennsylvania",
-    zipCode: "90006",
-    department: "Operations",
-    jobTitle: "Associate",
-    hireDate: "11/09/2021",
-    grossPay: 6920,
-    status: "Inactive",
-  },
-  {
-    id: 7,
-    firstName: "Robert",
-    lastName: "Miller",
-    fullName: "Robert Miller",
-    ssn: "100-77-7777",
-    address: "700 Main Street",
-    city: "San Antonio",
-    state: "Texas",
-    zipCode: "90007",
-    department: "Customer Service",
-    jobTitle: "Executive",
-    hireDate: "05/23/2024",
-    grossPay: 7140,
-    status: "Active",
-  },
-  {
-    id: 8,
-    firstName: "Mary",
-    lastName: "Davis",
-    fullName: "Mary Davis",
-    ssn: "100-88-8888",
-    address: "800 Main Street",
-    city: "San Diego",
-    state: "California",
-    zipCode: "90008",
-    department: "Legal",
-    jobTitle: "Consultant",
-    hireDate: "12/11/2025",
-    grossPay: 9110,
-    status: "Active",
-  },
-];
+export const initialEmployeeRows: EmployeeRow[] = [];
 
 export const employeeFormTemplate = {
   firstName: "",
@@ -304,103 +173,9 @@ export const usCityOptions = [
   { city: "Casper", state: "Wyoming" },
 ];
 
-export const initialVendors: VendorRow[] = [
-  {
-    vendorId: "V-1001",
-    legalName: "Pioneer Creative Studio",
-    address: "221 Market Street, San Francisco, CA 94105",
-    zipCode: "94105",
-    email: "billing@pioneercreative.com",
-    phone: "+1-415-555-1188",
-    state: "California",
-    category: "Design",
-    taxIdType: "EIN",
-    taxId: "86-4567890",
-    entityType: "LLC",
-    tinVerification: "Verified",
-    onboardingSource: "Manual",
-    w9RequestStatus: "Not Requested",
-  },
-  {
-    vendorId: "V-1002",
-    legalName: "Ethan Brooks Consulting",
-    address: "90 Broadway, New York, NY 10007",
-    zipCode: "10007",
-    email: "ethan@brooksconsulting.com",
-    phone: "+1-212-555-4190",
-    state: "New York",
-    category: "Consulting",
-    taxIdType: "SSN",
-    taxId: "523-11-8899",
-    entityType: "Individual",
-    tinVerification: "Verified",
-    onboardingSource: "Manual",
-    w9RequestStatus: "Not Requested",
-  },
-  {
-    vendorId: "V-1003",
-    legalName: "North Harbor Hardware Inc",
-    address: "1450 Pine Ave, Seattle, WA 98101",
-    zipCode: "98101",
-    email: "ap@northharbor.com",
-    phone: "+1-206-555-2210",
-    state: "Washington",
-    category: "Operations",
-    taxIdType: "EIN",
-    taxId: "91-2233445",
-    entityType: "Corporation",
-    tinVerification: "Verified",
-    onboardingSource: "Manual",
-    w9RequestStatus: "Not Requested",
-  },
-];
+export const initialVendors: VendorRow[] = [];
 
-export const initialVendorPayments: VendorPaymentRow[] = [
-  {
-    id: 1,
-    vendorId: "V-1001",
-    paymentDate: "2026-01-15",
-    invoiceNumber: "INV-4582",
-    amount: 1250,
-    paymentState: "California",
-    stateWithholding: 87.5,
-    year: "2026",
-    quarter: "Q1",
-  },
-  {
-    id: 2,
-    vendorId: "V-1002",
-    paymentDate: "2026-02-06",
-    invoiceNumber: "INV-1177",
-    amount: 350,
-    paymentState: "New York",
-    stateWithholding: 22.75,
-    year: "2026",
-    quarter: "Q1",
-  },
-  {
-    id: 3,
-    vendorId: "V-1002",
-    paymentDate: "2026-03-10",
-    invoiceNumber: "INV-1218",
-    amount: 420,
-    paymentState: "New York",
-    stateWithholding: 27.3,
-    year: "2026",
-    quarter: "Q1",
-  },
-  {
-    id: 4,
-    vendorId: "V-1003",
-    paymentDate: "2026-01-28",
-    invoiceNumber: "INV-7730",
-    amount: 2100,
-    paymentState: "Washington",
-    stateWithholding: 0,
-    year: "2026",
-    quarter: "Q1",
-  },
-];
+export const initialVendorPayments: VendorPaymentRow[] = [];
 
 export const generateVendorId = () => {
   const timestamp = Date.now().toString().slice(-6);
@@ -443,19 +218,19 @@ export const w9FormTemplate = {
 export const usStateOptions = Array.from(new Set(usCityOptions.map((item) => item.state))).sort();
 
 export const initialEmployerProfile: EmployerProfile = {
-  legalName: "TaxCore360 Holdings LLC",
-  ein: "12-3456789",
-  addressLine1: "850 Market Street",
-  addressLine2: "San Francisco, CA 94103",
-  controlNumber: "TC360-W2-2026",
+  legalName: "",
+  ein: "",
+  addressLine1: "",
+  addressLine2: "",
+  controlNumber: "",
 };
 
 export const initialSubscriptionSettings: SubscriptionSettings = {
   plan: "Professional" as SubscriptionPlan,
   status: "Active" as SubscriptionStatus,
   billingCycle: "Annual" as BillingCycle,
-  seats: 12,
-  renewalDate: "2026-12-31",
+  seats: 0,
+  renewalDate: "",
 };
 
 export const subscriptionPlanCatalog: Array<{
@@ -484,15 +259,7 @@ export const subscriptionPlanCatalog: Array<{
   },
 ];
 
-export const initialAppUserDirectory: AppUserRecord[] = [
-  {
-    email: "admin@taxcore360.com",
-    password: "TaxCore360@2026",
-    name: "Abdulrhman",
-    role: "Global Admin",
-    status: "Active",
-  },
-];
+export const initialAppUserDirectory: AppUserRecord[] = [];
 
 export const w2FieldAliases = {
   employeeSsn: ["employeesocialsecuritynumber", "ssn", "socialsecurity"],

@@ -16,12 +16,8 @@ import {
   employeeFormTemplate,
   executiveChartPalette,
   filingLifecycleOptions,
-  initialAppUserDirectory,
-  initialEmployeeRows,
   initialEmployerProfile,
   initialSubscriptionSettings,
-  initialVendorPayments,
-  initialVendors,
   paymentFormTemplate,
   payrollMonthOptions,
   reportTypeOptions,
@@ -144,7 +140,7 @@ function App() {
   const [isTasksOpen, setIsTasksOpen] = useState(false);
   const [isDocumentsOpen, setIsDocumentsOpen] = useState(false);
 
-  const [employees, setEmployees] = useState<EmployeeRow[]>(initialEmployeeRows);
+  const [employees, setEmployees] = useState<EmployeeRow[]>([]);
   const [employeeForm, setEmployeeForm] = useState(employeeFormTemplate);
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
 
@@ -298,9 +294,7 @@ function App() {
     navigate(getAuthPathForScreen(screen));
   };
 
-  const [vendors, setVendors] = useState<VendorRow[]>(
-    initialVendors.map((vendor) => ({ ...vendor, companyId: vendor.companyId ?? activeCompanyId })),
-  );
+  const [vendors, setVendors] = useState<VendorRow[]>([]);
   const [vendorForm, setVendorForm] = useState(vendorFormTemplate);
   const [vendorFormMessage, setVendorFormMessage] = useState("");
   const [isVendorFormOpen, setIsVendorFormOpen] = useState(false);
@@ -336,19 +330,17 @@ function App() {
     }
   }, [supabaseUser]);
 
-  const [selected1099VendorId, setSelected1099VendorId] = useState(initialVendors[0]?.vendorId ?? "");
+  const [selected1099VendorId, setSelected1099VendorId] = useState("");
   const [selected1099Year, setSelected1099Year] = useState(defaultYear);
   const [selectedPayrollMonth, setSelectedPayrollMonth] = useState(defaultPayrollMonth);
-  const [selectedW2EmployeeId, setSelectedW2EmployeeId] = useState(initialEmployeeRows[0]?.id ?? 0);
+  const [selectedW2EmployeeId, setSelectedW2EmployeeId] = useState(0);
   const [selectedW2Year, setSelectedW2Year] = useState(defaultYear);
   const [selectedReportYear, setSelectedReportYear] = useState(defaultYear);
-  const [selectedReportEmployeeId, setSelectedReportEmployeeId] = useState(initialEmployeeRows[0]?.id ?? 0);
+  const [selectedReportEmployeeId, setSelectedReportEmployeeId] = useState(0);
   const [reportFocus, setReportFocus] = useState<ReportFocus | null>(null);
   const [reportDocumentType, setReportDocumentType] = useState<ReportDocumentType>("report");
 
-  const [vendorPayments, setVendorPayments] = useState<VendorPaymentRow[]>(
-    initialVendorPayments.map((payment) => ({ ...payment, companyId: payment.companyId ?? activeCompanyId })),
-  );
+  const [vendorPayments, setVendorPayments] = useState<VendorPaymentRow[]>([]);
   const [paymentForm, setPaymentForm] = useState(paymentFormTemplate);
   const [paymentFormMessage, setPaymentFormMessage] = useState("");
   const [paymentAttachment, setPaymentAttachment] = useState<File | null>(null);
@@ -426,7 +418,7 @@ function App() {
   const [vendorDocuments, setVendorDocuments] = useState<VendorDocument[]>([]);
   const [vendorDocFile, setVendorDocFile] = useState<File | null>(null);
   const [vendorDocForm, setVendorDocForm] = useState<{ vendorId: string; category: VendorDocument["category"]; note: string }>({
-    vendorId: initialVendors[0]?.vendorId ?? "",
+    vendorId: "",
     category: "Invoice",
     note: "",
   });
@@ -444,7 +436,7 @@ function App() {
   const [brandLogoUrl, setBrandLogoUrl] = useState("/images/logo.png");
   const [brandLogoName, setBrandLogoName] = useState("");
   const [platformName, setPlatformName] = useState("TaxCore360");
-  const [formSignerName, setFormSignerName] = useState(initialAppUserDirectory[0]?.name ?? "Authorized Signer");
+  const [formSignerName, setFormSignerName] = useState("");
   const [formSignatureLedger, setFormSignatureLedger] = useState<Record<string, { signedBy: string; signedAt: string }>>({});
   const [employerProfile, setEmployerProfile] = useState(initialEmployerProfile);
   const [settingsMessage, setSettingsMessage] = useState("");
@@ -460,13 +452,13 @@ function App() {
   });
   const [quickbooksMessage, setQuickbooksMessage] = useState("");
   const [paymentMethodSettings, setPaymentMethodSettings] = useState<PaymentMethodSettings>({
-    holderName: initialAppUserDirectory[0]?.name ?? "",
-    brand: "Visa",
-    cardLast4: "4242",
-    expiry: "12/28",
+    holderName: "",
+    brand: "",
+    cardLast4: "",
+    expiry: "",
   });
 
-  const [userDirectory, setUserDirectory] = useState<AppUserRecord[]>(initialAppUserDirectory);
+  const [userDirectory, setUserDirectory] = useState<AppUserRecord[]>([]);
   const [userAdminForm, setUserAdminForm] = useState<UserAdminForm>({
     name: "",
     email: "",
@@ -479,16 +471,6 @@ function App() {
   const [bulkPayDate, setBulkPayDate] = useState(getDefaultPaymentDate(defaultPayrollMonth));
   const [payrollPayments, setPayrollPayments] = useState<Record<string, PayrollPaymentRecord>>(() => {
     const initialRecords: Record<string, PayrollPaymentRecord> = {};
-
-    initialEmployeeRows.forEach((employee) => {
-      payrollMonthOptions.forEach((month) => {
-        initialRecords[`${month}-${employee.id}`] = {
-          paymentMethod: "Bank Transfer",
-          payDate: getDefaultPaymentDate(month),
-          isPaid: false,
-        };
-      });
-    });
 
     return initialRecords;
   });

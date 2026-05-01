@@ -2,12 +2,8 @@ import { useState } from "react";
 import type { AuthUser, ViewMode, PortalSection, W2Section } from "../app/types";
 import {
   companyOptions,
-  initialAppUserDirectory,
-  initialEmployeeRows,
   initialEmployerProfile,
   initialSubscriptionSettings,
-  initialVendors,
-  initialVendorPayments,
   payrollMonthOptions,
   employeeFormTemplate,
   vendorFormTemplate,
@@ -39,10 +35,10 @@ export const useAppState = () => {
   const [isPaymentFormOpen, setIsPaymentFormOpen] = useState(false);
 
   // Data state
-  const [employees, setEmployees] = useState(initialEmployeeRows);
-  const [vendors, setVendors] = useState(initialVendors);
-  const [vendorPayments, setVendorPayments] = useState(initialVendorPayments);
-  const [userDirectory, setUserDirectory] = useState(initialAppUserDirectory);
+  const [employees, setEmployees] = useState([]);
+  const [vendors, setVendors] = useState([]);
+  const [vendorPayments, setVendorPayments] = useState([]);
+  const [userDirectory, setUserDirectory] = useState([]);
   const [employerProfile, setEmployerProfile] = useState(initialEmployerProfile);
   const [subscriptionSettings, setSubscriptionSettings] = useState(initialSubscriptionSettings);
 
@@ -52,10 +48,10 @@ export const useAppState = () => {
   const [paymentForm, setPaymentForm] = useState(paymentFormTemplate);
 
   // Selection states
-  const [selected1099VendorId, setSelected1099VendorId] = useState(initialVendors[0]?.vendorId ?? "");
+  const [selected1099VendorId, setSelected1099VendorId] = useState("");
   const [selected1099Year, setSelected1099Year] = useState(payrollMonthOptions[0]?.split("-")[0] ?? String(new Date().getFullYear()));
   const [selectedPayrollMonth, setSelectedPayrollMonth] = useState(payrollMonthOptions[0] ?? `${new Date().getFullYear()}-01`);
-  const [selectedW2EmployeeId, setSelectedW2EmployeeId] = useState(initialEmployeeRows[0]?.id ?? 0);
+  const [selectedW2EmployeeId, setSelectedW2EmployeeId] = useState(0);
   const [selectedW2Year, setSelectedW2Year] = useState(payrollMonthOptions[0]?.split("-")[0] ?? String(new Date().getFullYear()));
 
   // Computed values
