@@ -9,17 +9,13 @@ nodeVersion = "20"
 content = """
 :{$PORT} {
     root * /app/dist
+    file_server
     
-    # Try to serve files directly
-    handle /assets/* {
-        file_server
+    # SPA fallback - rewrite all non-file paths to index.html
+    @notFile {
+        not file
     }
-    
-    # For all other paths, serve index.html (SPA)
-    handle {
-        try_files {path} /index.html
-        file_server
-    }
+    rewrite @notFile /index.html
 }
 """
 
