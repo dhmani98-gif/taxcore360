@@ -59,6 +59,23 @@ export const authService = {
       };
     } catch (error) {
       const authError = error as AuthError;
+      const errorMessage = authError.message || '';
+      
+      // Handle specific error cases
+      if (errorMessage.includes('429') || errorMessage.includes('rate limit') || errorMessage.includes('over_email_send_rate_limit')) {
+        return {
+          success: false,
+          error: 'Email rate limit exceeded. Please wait 1 hour before trying again, or use Google/Microsoft SSO instead.',
+        };
+      }
+      
+      if (errorMessage.includes('422')) {
+        return {
+          success: false,
+          error: 'Invalid request. This may be due to:\n1. Email rate limit exceeded\n2. Invalid email format\n3. Password too weak\n\nPlease try again or use Google/Microsoft SSO.',
+        };
+      }
+      
       return {
         success: false,
         error: authError.message || 'Failed to sign up',
@@ -92,9 +109,9 @@ export const authService = {
       let authError: any;
       
       const timeoutId = setTimeout(() => {
-        console.error('Auth call timed out after 8 seconds');
-        authError = new Error('Unable to connect to authentication server. Please check your internet connection and try again.');
-      }, 8000);
+        console.error('Auth call timed out after 15 seconds');
+        authError = new Error('Connection to Supabase timed out. This may be due to:\n1. Network restrictions\n2. Supabase project paused or unavailable\n3. Rate limiting exceeded\n\nPlease try again in a few minutes or use Google/Microsoft SSO instead.');
+      }, 15000);
       
       try {
         const result = await supabase.auth.signInWithPassword({
@@ -180,7 +197,7 @@ export const authService = {
       }
 
       // Fetch user profile - don't wait for it to speed up loading
-      const { data: profile, error: profileError } = await supabase
+      const { data: profile } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', session.user.id)
@@ -241,7 +258,7 @@ export const authService = {
   },
 
   // Sign in with OAuth (Google, Microsoft, etc.)
-  signInWithOAuth: async (provider: 'google' | 'microsoft' | 'apple' | 'github'): Promise<{ success: boolean; error?: string }> => {
+  signInWithOAuth: async (provider: 'google' | 'azure' | 'apple' | 'github'): Promise<{ success: boolean; error?: string }> => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
