@@ -2,6 +2,35 @@
 @import "tailwindcss";
 
 /* =================================================================
+   ⚡ PERFORMANCE OPTIMIZATIONS
+   ================================================================= */
+
+/* Smooth scrolling with reduced motion preference */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* GPU acceleration for animated elements */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* Optimize paint performance */
+.optimize-paint {
+  contain: layout style paint;
+}
+
+/* Content visibility for off-screen sections */
+.content-visibility {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px;
+}
+
+/* =================================================================
    🎨 COMPLETE DESIGN SYSTEM — TaxCore360
    ================================================================= */
 

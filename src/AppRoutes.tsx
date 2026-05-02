@@ -1,8 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import type { AuthUser } from "./services/authService";
 
-// View components placeholders - we'll import actual components
-import App from "./App";
+// Lazy loaded App component for better performance
+import { LazyApp } from "./components/LazyApp";
 
 interface AppRoutesProps {
   user: AuthUser | null;
@@ -22,23 +22,23 @@ export function AppRoutes({ user: _user, loading }: AppRoutesProps) {
   // In a full refactor, each route would render a specific view component
   return (
     <Routes>
-      <Route path="/" element={<App />} />
-      <Route path="/dashboard" element={<App />} />
-      <Route path="/employees" element={<App />} />
-      <Route path="/payroll" element={<App />} />
-      <Route path="/vendors" element={<App />} />
-      <Route path="/w2" element={<App />} />
-      <Route path="/w2/forms" element={<App />} />
-      <Route path="/w2/summary" element={<App />} />
-      <Route path="/portal" element={<App />} />
-      <Route path="/portal/*" element={<App />} />
-      <Route path="/reports" element={<App />} />
-      <Route path="/settings" element={<App />} />
-      <Route path="/subscriptions" element={<App />} />
-      <Route path="/tasks" element={<App />} />
-      <Route path="/documents" element={<App />} />
-      <Route path="/login" element={<App />} />
-      <Route path="/auth/*" element={<App />} />
+      <Route path="/" element={<LazyApp />} />
+      <Route path="/dashboard" element={<LazyApp />} />
+      <Route path="/employees" element={<LazyApp />} />
+      <Route path="/payroll" element={<LazyApp />} />
+      <Route path="/vendors" element={<LazyApp />} />
+      <Route path="/w2" element={<LazyApp />} />
+      <Route path="/w2/forms" element={<LazyApp />} />
+      <Route path="/w2/summary" element={<LazyApp />} />
+      <Route path="/portal" element={<LazyApp />} />
+      <Route path="/portal/*" element={<LazyApp />} />
+      <Route path="/reports" element={<LazyApp />} />
+      <Route path="/settings" element={<LazyApp />} />
+      <Route path="/subscriptions" element={<LazyApp />} />
+      <Route path="/tasks" element={<LazyApp />} />
+      <Route path="/documents" element={<LazyApp />} />
+      <Route path="/login" element={<LazyApp />} />
+      <Route path="/auth/*" element={<LazyApp />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
