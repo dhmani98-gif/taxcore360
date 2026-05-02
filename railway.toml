@@ -7,10 +7,11 @@ nodeVersion = "20"
 # Caddy configuration for SPA routing
 [build.nixpacksConfig.caddyfile]
 content = """
-:{$PORT}
-root * /app/dist
-try_files {path} /index.html
-file_server
+:{$PORT} {
+    root * /app/dist
+    try_files {path} {path}/ /index.html
+    file_server
+}
 """
 
 [deploy]
