@@ -1,4 +1,6 @@
 import type { Dispatch, SetStateAction } from "react";
+import { useRef } from "react";
+import { useReactToPrint } from "react-to-print";
 import type { EmployeeRow, W2Section } from "../../app/types";
 
 type W2ViewProps = {
@@ -55,6 +57,21 @@ export function W2View({
   employerProfile,
 }: W2ViewProps) {
   const currentEmployee = employees.find(e => e.id === selectedW2EmployeeId) || employees[0];
+  
+  const w3PrintRef = useRef<HTMLDivElement>(null);
+  const w2PrintRef = useRef<HTMLDivElement>(null);
+  
+  const handlePrintW3 = useReactToPrint({
+    contentRef: w3PrintRef,
+    documentTitle: `W3-Transmittal-${selectedW2Year}`,
+    pageStyle: "@page { size: A4 portrait; margin: 10mm; }",
+  });
+  
+  const handlePrintW2 = useReactToPrint({
+    contentRef: w2PrintRef,
+    documentTitle: `W2-${currentEmployee?.firstName || 'Employee'}-${selectedW2Year}`,
+    pageStyle: "@page { size: A4 portrait; margin: 10mm; }",
+  });
 
   // W-3 Summary View
   if (w2Section === "summary") {
@@ -72,11 +89,17 @@ export function W2View({
           </div>
           <div className="flex items-center gap-2">
             <button
+               onClick={() => handlePrintW3()}
+               className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-[12px] font-bold text-slate-700 shadow-sm hover:bg-slate-50"
+            >
+               Print W-3
+            </button>
+            <button
                onClick={handleGenerateOfficialW3Pdf}
                disabled={isGeneratingOfficialW2}
                className="rounded-xl bg-slate-800 px-5 py-2.5 text-[12px] font-bold text-white shadow-lg shadow-slate-900/10 hover:bg-slate-900 hover:-translate-y-0.5"
             >
-               {isGeneratingOfficialW2 ? "Generating..." : "Generate Official W-3 PDF"}
+               {isGeneratingOfficialW2 ? "Generating..." : "Generate PDF"}
             </button>
           </div>
         </div>
@@ -84,7 +107,7 @@ export function W2View({
         <div className="bg-slate-50/50 p-6">
           <div className="mx-auto max-w-[1100px]">
              {/* W-3 Form */}
-             <div id="print-w3-area" className="w3-print-wrap rounded-2xl border border-slate-200 bg-white p-8 shadow-xl">
+             <div ref={w3PrintRef} id="print-w3-area" className="w3-print-wrap rounded-2xl border border-slate-200 bg-white p-8 shadow-xl print:p-0 print:border-0 print:shadow-none">
                <div className="mb-6 flex items-start justify-between border-b border-slate-800 pb-4">
                  <div>
                     <h1 className="text-[28px] font-black tracking-tighter text-slate-900">Form W-3</h1>
@@ -264,11 +287,17 @@ export function W2View({
         </div>
         <div className="flex items-center gap-2">
           <button
+             onClick={() => handlePrintW2()}
+             className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-[12px] font-bold text-slate-700 shadow-sm hover:bg-slate-50"
+          >
+             Print W-2
+          </button>
+          <button
              onClick={() => handleGenerateOfficialW2Pdf(currentEmployee.id, selectedW2Year)}
              disabled={isGeneratingOfficialW2}
              className="rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-2.5 text-[12px] font-bold text-white shadow-[0_6px_20px_-6px_rgba(37,99,235,0.45)] hover:shadow-[0_10px_28px_-6px_rgba(37,99,235,0.55)] hover:-translate-y-0.5 active:scale-[0.98]"
           >
-             {isGeneratingOfficialW2 ? "Generating..." : "Generate Official W-2 PDF"}
+             {isGeneratingOfficialW2 ? "Generating..." : "Generate PDF"}
           </button>
         </div>
       </div>
@@ -276,7 +305,7 @@ export function W2View({
       <div className="bg-slate-50/50 p-6">
         <div className="mx-auto max-w-[900px]">
            {/* IRS Mock Representation (Styled Paper-like) */}
-           <div id="print-w2-area" className="w2-print-wrap rounded-2xl border border-slate-200 bg-white p-10 shadow-xl">
+           <div ref={w2PrintRef} id="print-w2-area" className="w2-print-wrap rounded-2xl border border-slate-200 bg-white p-10 shadow-xl print:p-0 print:border-0 print:shadow-none">
              <div className="mb-6 flex items-start justify-between border-b border-slate-800 pb-4">
                <div>
                   <h1 className="text-[28px] font-black tracking-tighter text-slate-900">Form W-2</h1>
