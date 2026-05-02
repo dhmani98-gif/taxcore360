@@ -1,5 +1,6 @@
 import type { Dispatch, SetStateAction } from "react";
 import type { AuthUser, PortalSection, ViewMode, W2Section } from "../../app/types";
+import type { SubscriptionTier } from "../../services/subscriptionService";
 
 type AppSidebarProps = {
   brandLogoUrl: string;
@@ -23,6 +24,12 @@ type AppSidebarProps = {
   setIsDocumentsOpen: Dispatch<SetStateAction<boolean>>;
   onOpenReports: () => void;
   onLogout: () => void;
+  // Subscription info
+  subscriptionTier?: SubscriptionTier;
+  employeesUsed?: number;
+  employeesLimit?: number;
+  vendorsUsed?: number;
+  vendorsLimit?: number;
 };
 
 function IconChevron() {
@@ -69,6 +76,11 @@ export function AppSidebar({
   setIsDocumentsOpen,
   onOpenReports,
   onLogout,
+  subscriptionTier = "free",
+  employeesUsed = 0,
+  employeesLimit = 5,
+  vendorsUsed = 0,
+  vendorsLimit = 3,
 }: AppSidebarProps) {
   return (
     <aside className="app-sidebar sticky top-0 flex flex-col h-screen w-full xl:w-[280px] xl:border-r-0">
@@ -247,6 +259,44 @@ export function AppSidebar({
 
       {/* ── User ── */}
       <div className="border-t border-white/[0.06] px-4 py-4">
+        {/* Subscription Tier Badge */}
+        <div className="mb-3 flex items-center justify-between rounded-lg bg-white/[0.04] px-3 py-2">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Plan</span>
+          <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase ${
+            subscriptionTier === "enterprise" 
+              ? "bg-purple-500/20 text-purple-300" 
+              : subscriptionTier === "pro" 
+                ? "bg-blue-500/20 text-blue-300" 
+                : "bg-slate-500/20 text-slate-300"
+          }`}>
+            {subscriptionTier}
+          </span>
+        </div>
+        
+        {/* Usage Meter */}
+        <div className="mb-3 space-y-2">
+          <div className="flex items-center justify-between text-[10px]">
+            <span className="text-slate-400">Employees</span>
+            <span className="text-slate-300">{employeesUsed}/{employeesLimit}</span>
+          </div>
+          <div className="h-1.5 rounded-full bg-slate-700">
+            <div 
+              className="h-1.5 rounded-full bg-blue-500 transition-all" 
+              style={{ width: `${Math.min((employeesUsed / employeesLimit) * 100, 100)}%` }}
+            />
+          </div>
+          <div className="flex items-center justify-between text-[10px]">
+            <span className="text-slate-400">Vendors</span>
+            <span className="text-slate-300">{vendorsUsed}/{vendorsLimit}</span>
+          </div>
+          <div className="h-1.5 rounded-full bg-slate-700">
+            <div 
+              className="h-1.5 rounded-full bg-emerald-500 transition-all" 
+              style={{ width: `${Math.min((vendorsUsed / vendorsLimit) * 100, 100)}%` }}
+            />
+          </div>
+        </div>
+
         <div className="flex items-center gap-3 rounded-xl bg-white/[0.04] p-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-[13px] font-bold text-white">
             {authUser?.name.slice(0, 1) ?? "A"}

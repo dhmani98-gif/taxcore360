@@ -5,6 +5,9 @@ import { useMemo, useState, useEffect } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
+import { useSubscription } from "./hooks/useSubscription";
+import { subscriptionService } from "./services/subscriptionService";
+import type { CompanySubscription } from "./services/subscriptionService";
 import { supabaseEmployeeService } from "./services/supabaseEmployeeService";
 import { supabaseVendorService } from "./services/supabaseVendorService";
 import { supabasePaymentService } from "./services/supabasePaymentService";
@@ -112,6 +115,16 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user: supabaseUser, loading: authLoading, signIn, signUp, signOut, resetPassword, signInWithOAuth } = useAuth();
+  
+  // Subscription management
+  const {
+    subscription,
+    canAddEmployee,
+    canAddVendor,
+    employeesRemaining,
+    vendorsRemaining,
+    upgradeMessage,
+  } = useSubscription(supabaseUser?.company_id || null);
   
   const activeCompanyId = companyOptions[0]?.id ?? "TC360-HQ";
   const defaultYear = payrollMonthOptions[0]?.split("-")[0] ?? String(new Date().getFullYear());
@@ -1459,6 +1472,13 @@ function App() {
   const handleAddEmployee = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    // Check subscription limit
+    if (!canAddEmployee) {
+      setAuthMessage(upgradeMessage || "Employee limit reached. Please upgrade your plan.");
+      setAuthMessageType("error");
+      return;
+    }
+
     const firstName = employeeForm.firstName.trim();
     const lastName = employeeForm.lastName.trim();
     const grossPay = Number(employeeForm.grossPay);
@@ -1539,6 +1559,12 @@ function App() {
 
   const handleAddVendor = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    // Check subscription limit
+    if (!canAddVendor) {
+      setVendorFormMessage(upgradeMessage || "Vendor limit reached. Please upgrade your plan.");
+      return;
+    }
 
     const vendorId = vendorForm.vendorId.trim().toUpperCase();
     const legalName = vendorForm.legalName.trim();
@@ -2988,6 +3014,11 @@ function App() {
             navigate("/reports");
           }}
           onLogout={handleLogout}
+          subscriptionTier={subscription?.tier || "free"}
+          employeesUsed={employees.length}
+          employeesLimit={subscription ? subscriptionService.getLimits(subscription.tier).maxEmployees : 5}
+          vendorsUsed={vendors.length}
+          vendorsLimit={subscription ? subscriptionService.getLimits(subscription.tier).maxVendors : 3}
         />
 
         <main className="min-w-0 flex-1 bg-[var(--page-bg)]">
