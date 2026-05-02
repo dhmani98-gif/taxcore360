@@ -9,8 +9,17 @@ nodeVersion = "20"
 content = """
 :{$PORT} {
     root * /app/dist
-    try_files {path} {path}/ /index.html
-    file_server
+    
+    # Try to serve files directly
+    handle /assets/* {
+        file_server
+    }
+    
+    # For all other paths, serve index.html (SPA)
+    handle {
+        try_files {path} /index.html
+        file_server
+    }
 }
 """
 
