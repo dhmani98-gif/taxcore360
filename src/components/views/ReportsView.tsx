@@ -1,4 +1,6 @@
 import type { Dispatch, SetStateAction } from "react";
+import { useRef } from "react";
+import { useReactToPrint } from "react-to-print";
 import type {
   EmployeeRow,
   FilingLifecycleStatus,
@@ -78,7 +80,6 @@ type ReportsViewProps = {
   selectedReportEmployeeId: number;
   setSelectedReportEmployeeId: Dispatch<SetStateAction<number>>;
   employees: EmployeeRow[];
-  handlePrintReport: () => void;
   reportDocumentLabel: string;
   reportReference: string;
   reportGeneratedOn: string;
@@ -123,7 +124,6 @@ export function ReportsView({
   selectedReportEmployeeId,
   setSelectedReportEmployeeId,
   employees,
-  handlePrintReport,
   reportDocumentLabel,
   reportReference,
   reportGeneratedOn,
@@ -150,6 +150,14 @@ export function ReportsView({
   scopedVendors,
   handleAssignUnallocatedPayment,
 }: ReportsViewProps) {
+  const reportPrintRef = useRef<HTMLDivElement>(null);
+  
+  const handlePrintReport = useReactToPrint({
+    contentRef: reportPrintRef,
+    documentTitle: `Report-${reportFocusLabel}-${selectedReportYear}`,
+    pageStyle: "@page { size: A4 portrait; margin: 10mm; }",
+  });
+  
   return (
     <>
       {!reportFocus ? (
@@ -245,7 +253,7 @@ export function ReportsView({
             </button>
           </div>
 
-          <div id="print-report-area" className="report-shell mx-4 mb-4 mt-3 rounded-xl border border-[#dbe3f0] bg-white p-6">
+          <div ref={reportPrintRef} id="print-report-area" className="report-shell mx-4 mb-4 mt-3 rounded-xl border border-[#dbe3f0] bg-white p-6 print:border-0 print:shadow-none">
             <div className="report-header mb-5 border-b border-[#e8eef8] pb-4">
               <div className="flex items-start justify-between gap-4">
                 <div>

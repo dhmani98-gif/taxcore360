@@ -1,4 +1,6 @@
 import type { Dispatch, FormEvent, SetStateAction } from "react";
+import { useRef } from "react";
+import { useReactToPrint } from "react-to-print";
 import { Building2, CircleAlert } from "lucide-react";
 import type {
   EmployerProfile,
@@ -107,7 +109,6 @@ type PortalViewProps = {
   selected1099VendorId: string;
   setSelected1099VendorId: Dispatch<SetStateAction<string>>;
   vendors: VendorRow[];
-  handlePrintReport: () => void;
   formSignerName: string;
   setFormSignerName: Dispatch<SetStateAction<string>>;
   handleSign1099Form: () => void;
@@ -177,7 +178,6 @@ export function PortalView({
   selected1099VendorId,
   setSelected1099VendorId,
   vendors,
-  handlePrintReport,
   formSignerName,
   setFormSignerName,
   handleSign1099Form,
@@ -187,6 +187,14 @@ export function PortalView({
   selected1099VendorTotal,
   selected1099VendorYearPayments,
 }: PortalViewProps) {
+  const print1099Ref = useRef<HTMLDivElement>(null);
+  
+  const handlePrintReport = useReactToPrint({
+    contentRef: print1099Ref,
+    documentTitle: `1099-NEC-${selected1099VendorId || 'Form'}`,
+    pageStyle: "@page { size: A4 portrait; margin: 10mm; }",
+  });
+  
   return (
     <>
       {portalSection === "vendors" && (
@@ -983,7 +991,7 @@ export function PortalView({
             )}
           </div>
 
-          <div id="print-1099-area" className="w2-print-wrap px-6 pb-12 pt-8 bg-slate-100/50">
+          <div ref={print1099Ref} id="print-1099-area" className="w2-print-wrap px-6 pb-12 pt-8 bg-slate-100/50 print:bg-white">
             <div className="w3-sheet mx-auto w-full max-w-[1120px] rounded-2xl border border-slate-800/20 bg-white p-12 shadow-2xl relative overflow-hidden">
               {/* Official Decorative Orbs for Form Context */}
               <div className="absolute top-0 right-0 h-64 w-64 translate-x-1/2 translate-y-[-50%] rounded-full bg-blue-50/50 blur-3xl" />

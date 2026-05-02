@@ -3190,7 +3190,6 @@ function App() {
                   selected1099VendorId={selected1099VendorId}
                   setSelected1099VendorId={setSelected1099VendorId}
                   vendors={vendors}
-                  handlePrintReport={handlePrintReport}
                   formSignerName={formSignerName}
                   setFormSignerName={setFormSignerName}
                   handleSign1099Form={handleSign1099Form}
@@ -3214,7 +3213,6 @@ function App() {
                   selectedReportEmployeeId={selectedReportEmployeeId}
                   setSelectedReportEmployeeId={setSelectedReportEmployeeId}
                   employees={employees}
-                  handlePrintReport={handlePrintReport}
                   reportDocumentLabel={reportDocumentLabel}
                   reportReference={reportReference}
                   reportGeneratedOn={reportGeneratedOn}
