@@ -3,21 +3,7 @@ builder = "nixpacks"
 
 [build.nixpacksConfig]
 nodeVersion = "20"
-
-# Caddy configuration for SPA routing
-[build.nixpacksConfig.caddyfile]
-content = """
-:{$PORT} {
-    root * /app/dist
-    file_server
-    
-    # SPA fallback - rewrite all non-file paths to index.html
-    @notFile {
-        not file
-    }
-    rewrite @notFile /index.html
-}
-"""
+# Caddy configuration is in Caddyfile at project root
 
 [deploy]
 healthcheckPath = "/"

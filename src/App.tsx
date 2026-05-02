@@ -2713,11 +2713,7 @@ function App() {
   };
 
   const handleSocialLogin = async (provider: string) => {
-    let providerLower = provider.toLowerCase() as 'google' | 'azure' | 'apple' | 'github';
-    // Map 'microsoft' to 'azure' for Supabase compatibility
-    if (providerLower === 'microsoft') {
-      providerLower = 'azure';
-    }
+    const providerLower = provider.toLowerCase() as 'google' | 'microsoft' | 'apple' | 'github';
     const result = await signInWithOAuth(providerLower);
     
     if (!result.success) {

@@ -1,0 +1,10 @@
+:{$PORT} {
+    root * /app/dist
+    file_server
+    
+    # SPA fallback - rewrite all non-file paths to index.html
+    @notFile {
+        not file
+    }
+    rewrite @notFile /index.html
+}

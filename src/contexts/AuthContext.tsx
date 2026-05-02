@@ -8,7 +8,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, fullName: string) => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<{ success: boolean; error?: string }>;
   resetPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
-  signInWithOAuth: (provider: 'google' | 'azure' | 'apple' | 'github') => Promise<{ success: boolean; error?: string }>;
+  signInWithOAuth: (provider: 'google' | 'microsoft' | 'apple' | 'github') => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -80,7 +80,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return await authService.resetPassword(email);
   };
 
-  const signInWithOAuth = async (provider: 'google' | 'azure' | 'apple' | 'github') => {
+  const signInWithOAuth = async (provider: 'google' | 'microsoft' | 'apple' | 'github') => {
     return await authService.signInWithOAuth(provider);
   };
 
