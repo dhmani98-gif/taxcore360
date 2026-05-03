@@ -59,12 +59,23 @@ export function SubscriptionsView({
                 className={`relative overflow-hidden rounded-2xl border-2 p-6 transition-all duration-300 ${
                   isCurrent
                     ? "border-blue-500 bg-blue-50/10 shadow-lg shadow-blue-500/10"
-                    : "border-slate-100 bg-slate-50/40 hover:border-slate-300 hover:bg-white"
+                    : plan.badge === "Most Popular"
+                      ? "border-emerald-400 bg-emerald-50/10 shadow-lg shadow-emerald-500/10"
+                      : plan.badge === "Best Value"
+                        ? "border-purple-400 bg-purple-50/10 shadow-lg shadow-purple-500/10"
+                        : "border-slate-100 bg-slate-50/40 hover:border-slate-300 hover:bg-white"
                 }`}
               >
                 {isCurrent && (
                   <div className="absolute -right-10 top-2 rotate-45 bg-blue-500 px-10 py-1 text-[9px] font-bold uppercase text-white shadow-sm">
                     Active
+                  </div>
+                )}
+                {plan.badge && !isCurrent && (
+                  <div className={`absolute -right-10 top-2 rotate-45 px-10 py-1 text-[9px] font-bold uppercase text-white shadow-sm ${
+                    plan.badge === "Most Popular" ? "bg-emerald-500" : "bg-purple-500"
+                  }`}>
+                    {plan.badge}
                   </div>
                 )}
                 <h4 className="text-[18px] font-extrabold text-slate-900">{plan.plan}</h4>
@@ -73,6 +84,19 @@ export function SubscriptionsView({
                   <span className="text-[12px] font-bold text-slate-400">/mo</span>
                 </div>
                 <p className="mt-2 text-[12px] leading-relaxed text-slate-500">{plan.subtitle}</p>
+                
+                {/* Features List */}
+                <ul className="mt-4 space-y-2">
+                  {plan.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-start gap-2 text-[11px] text-slate-600">
+                      <svg className="h-4 w-4 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
                 <button
                   type="button"
                   disabled={isCurrent}
@@ -80,7 +104,11 @@ export function SubscriptionsView({
                   className={`mt-6 w-full rounded-xl py-3 text-[12px] font-bold transition-all ${
                     isCurrent
                       ? "bg-white border border-slate-200 text-slate-400 shadow-none cursor-default"
-                      : "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-[0_6px_20px_-6px_rgba(37,99,235,0.45)] hover:shadow-[0_10px_28px_-6px_rgba(37,99,235,0.55)] hover:-translate-y-0.5 active:scale-[0.98]"
+                      : plan.badge === "Most Popular"
+                        ? "bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-[0_6px_20px_-6px_rgba(16,185,129,0.45)] hover:shadow-[0_10px_28px_-6px_rgba(16,185,129,0.55)] hover:-translate-y-0.5 active:scale-[0.98]"
+                        : plan.badge === "Best Value"
+                          ? "bg-gradient-to-r from-purple-600 to-purple-500 text-white shadow-[0_6px_20px_-6px_rgba(147,51,234,0.45)] hover:shadow-[0_10px_28px_-6px_rgba(147,51,234,0.55)] hover:-translate-y-0.5 active:scale-[0.98]"
+                          : "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-[0_6px_20px_-6px_rgba(37,99,235,0.45)] hover:shadow-[0_10px_28px_-6px_rgba(37,99,235,0.55)] hover:-translate-y-0.5 active:scale-[0.98]"
                   }`}
                 >
                   {isCurrent ? "Current Plan" : `Upgrade to ${plan.plan}`}

@@ -231,6 +231,7 @@ export type SubscriptionPlanRecord = {
   monthlyPrice: number;
   subtitle: string;
   features: string[];
+  badge?: string;
 };
 
 export type PaymentMethodSettings = {

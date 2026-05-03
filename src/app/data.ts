@@ -238,24 +238,51 @@ export const subscriptionPlanCatalog: Array<{
   monthlyPrice: number;
   subtitle: string;
   features: string[];
+  badge?: string;
 }> = [
   {
     plan: "Pay Per Form",
     monthlyPrice: 4,
-    subtitle: "Built for occasional filers",
-    features: ["Pay only for filed forms", "No monthly commitment", "Great for seasonal filing"],
+    subtitle: "Perfect for occasional filers and small projects",
+    features: [
+      "W-2 & 1099-NEC form generation",
+      "IRS-compliant electronic copies",
+      "Quarterly 941 filing tracking",
+      "Deadline alerts & reminders",
+      "AES-256 SOC 2 encryption",
+      "Up to 5 forms per month",
+    ],
   },
   {
     plan: "Professional",
     monthlyPrice: 79,
-    subtitle: "Built for growing operations",
-    features: ["Unlimited vendors", "QuickBooks integration workflow", "Electronic signature for W-9 and 1099"],
+    subtitle: "Ideal for growing businesses",
+    features: [
+      "Unlimited employees & contractors",
+      "Unlimited form generation",
+      "E-signature for W-9 forms",
+      "Automated filing (Excel/CSV import)",
+      "Quarterly 941 filing tracking",
+      "Priority email support",
+      "All Pay Per Form features",
+    ],
+    badge: "Most Popular",
   },
   {
     plan: "Enterprise",
     monthlyPrice: 199,
-    subtitle: "For accounting firms",
-    features: ["Multi-Entity workspace", "Unlimited client companies", "Priority compliance automation support"],
+    subtitle: "For accounting firms & large companies",
+    features: [
+      "Multi-workspace support",
+      "Dedicated technical support team",
+      "International compliance (CRA Canada)",
+      "Advanced user roles & permissions",
+      "White-label options",
+      "API access",
+      "Custom integrations",
+      "All Professional features",
+    ],
+    badge: "Best Value",
   },
 ];
 
