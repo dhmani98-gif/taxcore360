@@ -1,39 +1,129 @@
 
-export type SubscriptionTier = "free" | "pro" | "enterprise";
+// Subscription tier using the same naming as app types
+export type SubscriptionTier = "Pay Per Form" | "Professional" | "Enterprise";
+
+export type SubscriptionPlanInfo = {
+  name: string;
+  price: number;
+  priceLabel: string;
+  subtitle: string;
+  features: string[];
+  badge?: string;
+};
 
 export type SubscriptionLimits = {
   maxEmployees: number;
   maxVendors: number;
+  maxFormsPerMonth: number;
   allowExports: boolean;
-  allowAdvancedReports: boolean;
-  allowApi: boolean;
+  allowESignW9: boolean;
+  allowAutomatedFiling: boolean;
+  allowMultiWorkspace: boolean;
   prioritySupport: boolean;
+  dedicatedSupport: boolean;
+  internationalCompliance: boolean;
+  advancedPermissions: boolean;
+  quarterly941Tracking: boolean;
+  aes256Encryption: boolean;
 };
 
+// Plan display information
+export const SUBSCRIPTION_PLANS: Record<SubscriptionTier, SubscriptionPlanInfo> = {
+  "Pay Per Form": {
+    name: "Pay Per Form",
+    price: 4.00,
+    priceLabel: "$4.00",
+    subtitle: "Perfect for occasional filers and small projects",
+    features: [
+      "W-2 & 1099-NEC form generation",
+      "IRS-compliant electronic copies",
+      "Quarterly 941 filing tracking",
+      "Deadline alerts & reminders",
+      "AES-256 SOC 2 encryption",
+      "Up to 5 forms per month",
+    ],
+  },
+  Professional: {
+    name: "Professional",
+    price: 79.00,
+    priceLabel: "$79.00",
+    subtitle: "Ideal for growing businesses",
+    features: [
+      "Unlimited employees & contractors",
+      "Unlimited form generation",
+      "E-signature for W-9 forms",
+      "Automated filing (Excel/CSV import)",
+      "Quarterly 941 filing tracking",
+      "Priority email support",
+      "All Pay Per Form features",
+    ],
+    badge: "Most Popular",
+  },
+  Enterprise: {
+    name: "Enterprise",
+    price: 199.00,
+    priceLabel: "$199.00",
+    subtitle: "For accounting firms & large companies",
+    features: [
+      "Multi-workspace support",
+      "Dedicated technical support team",
+      "International compliance (CRA Canada)",
+      "Advanced user roles & permissions",
+      "White-label options",
+      "API access",
+      "Custom integrations",
+      "All Professional features",
+    ],
+    badge: "Best Value",
+  },
+};
+
+// Technical limits for each tier
 export const SUBSCRIPTION_TIERS: Record<SubscriptionTier, SubscriptionLimits> = {
-  free: {
+  "Pay Per Form": {
     maxEmployees: 5,
     maxVendors: 3,
-    allowExports: false,
-    allowAdvancedReports: false,
-    allowApi: false,
-    prioritySupport: false,
-  },
-  pro: {
-    maxEmployees: 50,
-    maxVendors: 25,
+    maxFormsPerMonth: 5,
     allowExports: true,
-    allowAdvancedReports: true,
-    allowApi: true,
-    prioritySupport: true,
+    allowESignW9: false,
+    allowAutomatedFiling: false,
+    allowMultiWorkspace: false,
+    prioritySupport: false,
+    dedicatedSupport: false,
+    internationalCompliance: false,
+    advancedPermissions: false,
+    quarterly941Tracking: true,
+    aes256Encryption: true,
   },
-  enterprise: {
+  Professional: {
     maxEmployees: Infinity,
     maxVendors: Infinity,
+    maxFormsPerMonth: Infinity,
     allowExports: true,
-    allowAdvancedReports: true,
-    allowApi: true,
+    allowESignW9: true,
+    allowAutomatedFiling: true,
+    allowMultiWorkspace: false,
     prioritySupport: true,
+    dedicatedSupport: false,
+    internationalCompliance: false,
+    advancedPermissions: false,
+    quarterly941Tracking: true,
+    aes256Encryption: true,
+  },
+  Enterprise: {
+    maxEmployees: Infinity,
+    maxVendors: Infinity,
+    maxFormsPerMonth: Infinity,
+    allowExports: true,
+    allowESignW9: true,
+    allowAutomatedFiling: true,
+    allowMultiWorkspace: true,
+    prioritySupport: true,
+    dedicatedSupport: true,
+    internationalCompliance: true,
+    advancedPermissions: true,
+    quarterly941Tracking: true,
+    aes256Encryption: true,
   },
 };
 
@@ -76,17 +166,34 @@ export const subscriptionService = {
 
   canUseAdvancedReports: (subscription: CompanySubscription | null): boolean => {
     if (!subscription) return false;
-    return SUBSCRIPTION_TIERS[subscription.tier].allowAdvancedReports;
+    // Advanced reports available on Professional and Enterprise
+    return subscription.tier !== "Pay Per Form";
   },
 
   // Format tier name for display
   formatTierName: (tier: SubscriptionTier): string => {
-    const names: Record<SubscriptionTier, string> = {
-      free: "Free",
-      pro: "Pro",
-      enterprise: "Enterprise",
-    };
-    return names[tier];
+    return SUBSCRIPTION_PLANS[tier].name;
+  },
+
+  // Get plan info
+  getPlanInfo: (tier: SubscriptionTier): SubscriptionPlanInfo => {
+    return SUBSCRIPTION_PLANS[tier];
+  },
+
+  // Check specific feature availability
+  canUseESignW9: (subscription: CompanySubscription | null): boolean => {
+    if (!subscription) return false;
+    return SUBSCRIPTION_TIERS[subscription.tier].allowESignW9;
+  },
+
+  canUseAutomatedFiling: (subscription: CompanySubscription | null): boolean => {
+    if (!subscription) return false;
+    return SUBSCRIPTION_TIERS[subscription.tier].allowAutomatedFiling;
+  },
+
+  canUseMultiWorkspace: (subscription: CompanySubscription | null): boolean => {
+    if (!subscription) return false;
+    return SUBSCRIPTION_TIERS[subscription.tier].allowMultiWorkspace;
   },
 
   // Get upgrade message when limit reached
@@ -97,16 +204,16 @@ export const subscriptionService = {
     if (!subscription) return "Please subscribe to continue.";
     
     const currentTier = subscription.tier;
-    const limit = resource === "employees" 
-      ? SUBSCRIPTION_TIERS[currentTier].maxEmployees 
-      : SUBSCRIPTION_TIERS[currentTier].maxVendors;
+    const limits = SUBSCRIPTION_TIERS[currentTier];
+    const used = resource === "employees" ? subscription.employeesUsed : subscription.vendorsUsed;
+    const limit = resource === "employees" ? limits.maxEmployees : limits.maxVendors;
 
-    if (currentTier === "free") {
-      return `You've reached the ${limit} ${resource} limit on the Free plan. Upgrade to Pro for ${resource === "employees" ? "50" : "25"} ${resource}.`;
-    } else if (currentTier === "pro") {
-      return `You've reached the ${limit} ${resource} limit on the Pro plan. Upgrade to Enterprise for unlimited ${resource}.`;
+    if (currentTier === "Pay Per Form") {
+      return `You've used ${used}/${limit} ${resource} on the Pay Per Form plan. Upgrade to Professional for unlimited ${resource} and advanced features.`;
+    } else if (currentTier === "Professional") {
+      return `You're on the Professional plan with unlimited ${resource}. Need multi-workspace support? Upgrade to Enterprise.`;
     }
-    return `You have reached the maximum limit.`;
+    return `You have unlimited ${resource} on your Enterprise plan.`;
   },
 };
 

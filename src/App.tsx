@@ -3014,7 +3014,7 @@ function App() {
             navigate("/reports");
           }}
           onLogout={handleLogout}
-          subscriptionTier={subscription?.tier || "free"}
+          subscriptionTier={subscription?.tier || "Pay Per Form"}
           employeesUsed={employees.length}
           employeesLimit={subscription ? subscriptionService.getLimits(subscription.tier).maxEmployees : 5}
           vendorsUsed={vendors.length}

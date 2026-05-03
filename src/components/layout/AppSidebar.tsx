@@ -76,7 +76,7 @@ export function AppSidebar({
   setIsDocumentsOpen,
   onOpenReports,
   onLogout,
-  subscriptionTier = "free",
+  subscriptionTier = "Pay Per Form",
   employeesUsed = 0,
   employeesLimit = 5,
   vendorsUsed = 0,
@@ -263,11 +263,11 @@ export function AppSidebar({
         <div className="mb-3 flex items-center justify-between rounded-lg bg-white/[0.04] px-3 py-2">
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Plan</span>
           <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase ${
-            subscriptionTier === "enterprise" 
+            subscriptionTier === "Enterprise" 
               ? "bg-purple-500/20 text-purple-300" 
-              : subscriptionTier === "pro" 
-                ? "bg-blue-500/20 text-blue-300" 
-                : "bg-slate-500/20 text-slate-300"
+              : subscriptionTier === "Professional" 
+                ? "bg-emerald-500/20 text-emerald-300" 
+                : "bg-blue-500/20 text-blue-300"
           }`}>
             {subscriptionTier}
           </span>

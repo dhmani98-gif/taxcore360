@@ -59,11 +59,11 @@ export function useSubscription(companyId: string | null): UseSubscriptionReturn
         };
         setSubscription(mapped);
       } else {
-        // No active subscription - default to free
+        // No active subscription - default to Pay Per Form
         setSubscription({
           id: "default",
           companyId: companyId,
-          tier: "free",
+          tier: "Pay Per Form",
           status: "active",
           currentPeriodStart: new Date().toISOString(),
           currentPeriodEnd: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
@@ -98,7 +98,7 @@ export function useSubscription(companyId: string | null): UseSubscriptionReturn
     : 0;
 
   const upgradeMessage =
-    subscription && subscription.tier !== "enterprise"
+    subscription && subscription.tier !== "Enterprise"
       ? subscriptionService.getUpgradeMessage(subscription, employeesRemaining === 0 ? "employees" : "vendors")
       : null;
 
