@@ -76,9 +76,9 @@ async function handleSubscriptionCreated(
   );
 
   // Find user by email
-  const { data: users, error: userError } = await supabase
-    .from("users")
-    .select("id, company_id")
+  const { data: profiles, error: userError } = await supabase
+    .from("profiles")
+    .select("id")
     .eq("email", customer.email)
     .limit(1);
 
@@ -86,100 +86,41 @@ async function handleSubscriptionCreated(
     throw new Error(`Error finding user: ${userError.message}`);
   }
 
-  if (!users || users.length === 0) {
-    // Create a new user if not exists
-    const { data: newUser, error: createError } = await supabase
-      .from("users")
-      .insert({
-        email: customer.email,
-        full_name: customer.name || customer.email,
-        role: "admin",
-      })
-      .select("id")
-      .single();
+  if (!profiles || profiles.length === 0) {
+    throw new Error(
+      `No profile found for email ${customer.email}. User must sign up first so a profile exists.`
+    );
+  }
 
-    if (createError) {
-      throw new Error(`Error creating user: ${createError.message}`);
-    }
+  const profile = profiles[0];
 
-    // Create subscription for new user
-    const { error: subError } = await supabase.from("subscriptions").insert({
-      user_id: newUser.id,
-      company_id: null,
-      tier: tier,
-      status: subscription.status === "active" ? "active" : "pending",
-      lemon_squeezy_subscription_id: subscription.id,
-      lemon_squeezy_customer_id: customer.id,
-      current_period_start: subscription.created_at,
-      current_period_end: subscription.renews_at,
-      employees_used: 0,
-      vendors_used: 0,
-    });
-
-    if (subError) {
-      throw new Error(`Error creating subscription: ${subError.message}`);
-    }
-  } else {
-    const user = users[0];
-
-    // Update or create subscription
-    const { data: existingSub, error: subQueryError } = await supabase
-      .from("subscriptions")
-      .select("id")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    if (subQueryError) {
-      throw new Error(`Error querying subscription: ${subQueryError.message}`);
-    }
-
-    if (existingSub) {
-      // Update existing subscription
-      const { error: updateError } = await supabase
-        .from("subscriptions")
-        .update({
-          tier: tier,
-          status: subscription.status === "active" ? "active" : "pending",
-          lemon_squeezy_subscription_id: subscription.id,
-          lemon_squeezy_customer_id: customer.id,
-          current_period_start: subscription.created_at,
-          current_period_end: subscription.renews_at,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", existingSub.id);
-
-      if (updateError) {
-        throw new Error(`Error updating subscription: ${updateError.message}`);
-      }
-    } else {
-      // Create new subscription
-      const { error: insertError } = await supabase.from("subscriptions").insert({
-        user_id: user.id,
-        company_id: user.company_id,
-        tier: tier,
+  const { error: upsertError } = await supabase
+    .from("lemon_subscriptions")
+    .upsert(
+      {
+        user_id: profile.id,
+        tier,
         status: subscription.status === "active" ? "active" : "pending",
         lemon_squeezy_subscription_id: subscription.id,
         lemon_squeezy_customer_id: customer.id,
         current_period_start: subscription.created_at,
         current_period_end: subscription.renews_at,
-        employees_used: 0,
-        vendors_used: 0,
-      });
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" }
+    );
 
-      if (insertError) {
-        throw new Error(`Error inserting subscription: ${insertError.message}`);
-      }
-    }
+  if (upsertError) {
+    throw new Error(`Error upserting lemon subscription: ${upsertError.message}`);
+  }
 
-    // Update user's subscription tier
-    const { error: userUpdateError } = await supabase
-      .from("users")
-      .update({ subscription_tier: tier })
-      .eq("id", user.id);
+  const { error: profileUpdateError } = await supabase
+    .from("profiles")
+    .update({ subscription_tier: tier, updated_at: new Date().toISOString() })
+    .eq("id", profile.id);
 
-    if (userUpdateError) {
-      console.error("Error updating user tier:", userUpdateError);
-    }
+  if (profileUpdateError) {
+    console.error("Error updating profile subscription tier:", profileUpdateError);
   }
 }
 
@@ -202,9 +143,9 @@ async function handleOrderCreated(
   );
 
   // Find user by email
-  const { data: users, error: userError } = await supabase
-    .from("users")
-    .select("id, company_id")
+  const { data: profiles, error: userError } = await supabase
+    .from("profiles")
+    .select("id")
     .eq("email", customer.email)
     .limit(1);
 
@@ -212,12 +153,12 @@ async function handleOrderCreated(
     throw new Error(`Error finding user: ${userError.message}`);
   }
 
-  if (users && users.length > 0) {
-    const user = users[0];
+  if (profiles && profiles.length > 0) {
+    const profile = profiles[0];
 
     // Log the order for tracking
-    const { error: orderError } = await supabase.from("subscription_orders").insert({
-      user_id: user.id,
+    const { error: orderError } = await supabase.from("lemon_orders").insert({
+      user_id: profile.id,
       order_id: data.id,
       product_name: order.product_name,
       variant_name: order.variant_name,
@@ -234,13 +175,22 @@ async function handleOrderCreated(
     // If this is a Pay Per Form order, add form credits
     if (tier === "Pay Per Form") {
       const { error: creditError } = await supabase.rpc("add_form_credits", {
-        p_user_id: user.id,
+        p_user_id: profile.id,
         p_credits: 5, // 5 forms per purchase
       });
 
       if (creditError) {
         console.error("Error adding form credits:", creditError);
       }
+    }
+
+    const { error: profileUpdateError } = await supabase
+      .from("profiles")
+      .update({ subscription_tier: tier, updated_at: new Date().toISOString() })
+      .eq("id", profile.id);
+
+    if (profileUpdateError) {
+      console.error("Error updating profile subscription tier from order:", profileUpdateError);
     }
   }
 }
@@ -253,7 +203,7 @@ async function handleSubscriptionUpdated(
   const subscription = data.attributes;
   
   const { error } = await supabase
-    .from("subscriptions")
+    .from("lemon_subscriptions")
     .update({
       status: subscription.status === "active" ? "active" : "cancelled",
       current_period_end: subscription.renews_at,
@@ -274,7 +224,7 @@ async function handleSubscriptionCancelled(
   const subscription = data.attributes;
   
   const { error } = await supabase
-    .from("subscriptions")
+    .from("lemon_subscriptions")
     .update({
       status: "cancelled",
       cancelled_at: new Date().toISOString(),
