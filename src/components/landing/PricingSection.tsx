@@ -60,6 +60,9 @@ export function PricingSection() {
             Plans That Fit Your Needs
           </h2>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+            جرب أي خطة مجاناً لمدة 14 يوم — لا يحتاج بطاقة ائتمان
+          </p>
+          <p className="text-lg text-slate-500 max-w-2xl mx-auto mt-2">
             Choose the right plan for your business with the ability to upgrade anytime
           </p>
         </div>

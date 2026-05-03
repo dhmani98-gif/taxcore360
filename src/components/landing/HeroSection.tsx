@@ -22,7 +22,7 @@ export function HeroSection({ onNavigateToAuth }: HeroSectionProps) {
                 onClick={() => onNavigateToAuth?.('register')}
                 className="px-8 py-4 text-lg font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl hover:shadow-xl hover:shadow-blue-500/25 transition-all transform hover:-translate-y-1"
               >
-                Start Free
+                جرب 14 يوم مجاناً
               </button>
               <button 
                 onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
@@ -31,6 +31,9 @@ export function HeroSection({ onNavigateToAuth }: HeroSectionProps) {
                 Explore Features
               </button>
             </div>
+            <p className="mt-3 text-sm text-slate-500">
+              لا يحتاج بطاقة ائتمان • إلغاء في أي وقت
+            </p>
             <div className="mt-12 flex items-center gap-8">
               <div className="text-center">
                 <p className="text-3xl font-bold text-slate-900">500+</p>

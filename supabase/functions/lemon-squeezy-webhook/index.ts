@@ -253,9 +253,9 @@ serve(async (req) => {
     }
 
     // Get signing secret from environment
-    const signingSecret = Deno.env.get("LEMON_SQUEEZY_SIGNING_SECRET");
+    const signingSecret = Deno.env.get("LEMON_SQUEEZY_WEBHOOK_SECRET");
     if (!signingSecret) {
-      console.error("LEMON_SQUEEZY_SIGNING_SECRET not set");
+      console.error("LEMON_SQUEEZY_WEBHOOK_SECRET not set");
       return new Response(
         JSON.stringify({ error: "Server configuration error" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
