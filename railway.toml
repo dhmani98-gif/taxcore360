@@ -2,7 +2,7 @@
 builder = "nixpacks"
 
 [build.nixpacksConfig]
-nodeVersion = "20"
+nodeVersion = "22"
 # Caddy configuration is in Caddyfile at project root
 
 [deploy]
