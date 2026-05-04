@@ -32,12 +32,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     };
 
-    // Add timeout to prevent infinite loading - reduced to 2 seconds
-    const timeoutId = setTimeout(() => {
-      console.log('Auth check timeout - setting loading to false');
-      setLoading(false);
-    }, 2000);
-
     checkSession();
 
     // Set up auth state listener
@@ -47,7 +41,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => {
-      clearTimeout(timeoutId);
       unsubscribe();
     };
   }, []);

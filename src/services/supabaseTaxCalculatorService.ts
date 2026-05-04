@@ -194,8 +194,8 @@ class TaxCalculatorService {
   }
 
   async projectTaxLiability(
-    companyId: string,
-    year: string,
+    _companyId: string,
+    _year: string,
     projectedWages: number
   ): Promise<Record<string, number>> {
     const futaTax = await this.calculateFUTA(projectedWages);

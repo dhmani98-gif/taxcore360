@@ -7,7 +7,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import { useSubscription } from "./hooks/useSubscription";
 import { subscriptionService } from "./services/subscriptionService";
-import type { CompanySubscription } from "./services/subscriptionService";
 import { supabaseEmployeeService } from "./services/supabaseEmployeeService";
 import { supabaseVendorService } from "./services/supabaseVendorService";
 import { supabasePaymentService } from "./services/supabasePaymentService";
@@ -121,8 +120,6 @@ function App() {
     subscription,
     canAddEmployee,
     canAddVendor,
-    employeesRemaining,
-    vendorsRemaining,
     upgradeMessage,
   } = useSubscription(supabaseUser?.company_id || null);
   
@@ -2486,14 +2483,6 @@ function App() {
     } finally {
       setIsGeneratingOfficialW2(false);
     }
-  };
-
-  const handlePrintReport = () => {
-    if (viewMode === "reports" && !reportFocus) {
-      return;
-    }
-
-    window.print();
   };
 
   const handleGenerateOfficialW3Pdf = async () => {

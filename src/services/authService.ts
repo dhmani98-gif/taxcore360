@@ -86,65 +86,24 @@ export const authService = {
         };
         return { success: true, user: demoUser };
       }
-      
-      // Wrap supabase call with manual timeout
-      let authResult: any;
-      let authError: any;
-      
-      const timeoutId = setTimeout(() => {
-        console.error('Auth call timed out after 20 seconds');
-        authError = new Error('Unable to connect to authentication server. Please check your internet connection and try again.');
-      }, 20000);
-      
-      try {
-        const result = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        authResult = result;
-      } catch (err) {
-        authError = err;
-      } finally {
-        clearTimeout(timeoutId);
-      }
-      
-      if (authError) throw authError;
-      if (!authResult) throw new Error('No response from authentication service');
-      
-      const { data, error } = authResult;
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
       if (error) throw error;
       if (!data?.user) throw new Error('No user data returned');
 
       console.log('Auth successful, user ID:', data.user.id);
-
-      // Fetch user profile with timeout
-      let profile: any = null;
-      const profileTimeoutId = setTimeout(() => {
-        console.log('Profile fetch timed out');
-      }, 3000);
-      
-      try {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', data.user.id)
-          .single();
-        profile = profileData;
-        console.log('Profile fetched:', profile);
-      } catch (profileErr) {
-        console.error('Error fetching profile (using defaults):', profileErr);
-      } finally {
-        clearTimeout(profileTimeoutId);
-      }
 
       return {
         success: true,
         user: {
           id: data.user.id,
           email: data.user.email!,
-          full_name: profile?.full_name || data.user.user_metadata?.full_name,
-          role: profile?.role || 'Viewer',
-          company_id: profile?.company_id,
+          full_name: data.user.user_metadata?.full_name,
+          role: 'Viewer',
+          company_id: undefined,
         },
       };
     } catch (error) {
@@ -180,7 +139,7 @@ export const authService = {
       }
 
       // Fetch user profile - don't wait for it to speed up loading
-      const { data: profile, error: profileError } = await supabase
+      const { data: profile } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', session.user.id)
@@ -243,8 +202,9 @@ export const authService = {
   // Sign in with OAuth (Google, Microsoft, etc.)
   signInWithOAuth: async (provider: 'google' | 'microsoft' | 'apple' | 'github'): Promise<{ success: boolean; error?: string }> => {
     try {
+      const supabaseProvider = provider === 'microsoft' ? 'azure' : provider;
       const { error } = await supabase.auth.signInWithOAuth({
-        provider,
+        provider: supabaseProvider as any,
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
         },
@@ -267,20 +227,37 @@ export const authService = {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         if (session?.user) {
-          // Fetch user profile
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
-
+          // Fast path: notify immediately
           callback({
             id: session.user.id,
             email: session.user.email!,
-            full_name: profile?.full_name,
-            role: profile?.role || 'Viewer',
-            company_id: profile?.company_id,
+            full_name: session.user.user_metadata?.full_name,
+            role: 'Viewer',
+            company_id: undefined,
           });
+
+          // Enrich asynchronously with profile data (no blocking)
+          void (async () => {
+            try {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+
+              if (!profile) return;
+
+              callback({
+                id: session.user.id,
+                email: session.user.email!,
+                full_name: profile.full_name ?? session.user.user_metadata?.full_name,
+                role: profile.role || 'Viewer',
+                company_id: profile.company_id,
+              });
+            } catch (e) {
+              console.error('Error fetching profile on auth state change:', e);
+            }
+          })();
         } else {
           callback(null);
         }
