@@ -1,9 +1,6 @@
 [build]
-builder = "nixpacks"
-
-[build.nixpacksConfig]
-nodeVersion = "22"
-# Caddy configuration is in Caddyfile at project root
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
 
 [deploy]
 startCommand = "npm run start"

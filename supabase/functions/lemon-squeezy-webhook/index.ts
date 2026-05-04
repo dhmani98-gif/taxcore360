@@ -237,8 +237,8 @@ async function handleSubscriptionCancelled(
   }
 }
 
-serve(async (req) => {
-  // Handle CORS preflight
+export default async (req: Request) => {
+  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -302,7 +302,24 @@ serve(async (req) => {
       );
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = createClient(
+      supabaseUrl, 
+      supabaseServiceKey,
+      {
+        global: {
+          headers: {
+            'Connection': 'keep-alive'
+          }
+        },
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false
+        },
+        db: {
+          schema: 'public'
+        }
+      }
+    );
 
     // Handle different event types
     switch (eventName) {
@@ -333,9 +350,10 @@ serve(async (req) => {
 
   } catch (error) {
     console.error("Webhook error:", error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
-});
+};
