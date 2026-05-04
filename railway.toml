@@ -6,6 +6,7 @@ nodeVersion = "20"
 # Caddy configuration is in Caddyfile at project root
 
 [deploy]
+startCommand = "npm run start"
 healthcheckPath = "/"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
