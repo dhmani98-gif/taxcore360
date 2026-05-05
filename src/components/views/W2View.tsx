@@ -56,7 +56,20 @@ export function W2View({
   w3Totals,
   employerProfile,
 }: W2ViewProps) {
-  const currentEmployee = employees.find(e => e.id === selectedW2EmployeeId) || employees[0];
+  if (employees.length === 0) {
+    return (
+      <div className="animate-fade-in p-6">
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+          <h2 className="text-lg font-bold text-slate-900">W-2 Forms</h2>
+          <p className="mt-2 text-sm text-slate-600">
+            No employees found. Please add at least one employee to generate W-2/W-3 forms.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const currentEmployee = employees.find((e) => e.id === selectedW2EmployeeId) ?? employees[0];
   
   const w3PrintRef = useRef<HTMLDivElement>(null);
   const w2PrintRef = useRef<HTMLDivElement>(null);
@@ -294,7 +307,7 @@ export function W2View({
           </button>
           <button
              onClick={() => handleGenerateOfficialW2Pdf(currentEmployee.id, selectedW2Year)}
-             disabled={isGeneratingOfficialW2}
+             disabled={isGeneratingOfficialW2 || !currentEmployee}
              className="rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-2.5 text-[12px] font-bold text-white shadow-[0_6px_20px_-6px_rgba(37,99,235,0.45)] hover:shadow-[0_10px_28px_-6px_rgba(37,99,235,0.55)] hover:-translate-y-0.5 active:scale-[0.98]"
           >
              {isGeneratingOfficialW2 ? "Generating..." : "Generate PDF"}
