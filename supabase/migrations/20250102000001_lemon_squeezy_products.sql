@@ -59,14 +59,49 @@ GRANT SELECT ON public.lemon_squeezy_products TO authenticated;
 GRANT SELECT ON public.lemon_squeezy_products TO anon;
 
 -- Insert your Lemon Squeezy products (run these after creating the table)
--- Uncomment and modify with your actual product/variant IDs:
+-- Note: Lemon Squeezy webhooks typically send a VARIANT id. If you don't have it yet,
+-- we store the checkout UUID as a temporary placeholder in variant_id.
+-- Once you know the real variant IDs, update variant_id values accordingly.
 
-/*
-INSERT INTO public.lemon_squeezy_products (product_id, variant_id, product_name, variant_name, tier, price, checkout_url) VALUES
-('8c2a1173-86c0-4f3d-9bd6-55c6eea44f08', 'variant-id-here', 'TaxFlow', 'Pay Per Form', 'Pay Per Form', 4.00, 'https://taxflow.lemonsqueezy.com/checkout/buy/8c2a1173-86c0-4f3d-9bd6-55c6eea44f08'),
-('8ce36460-1599-4916-a8b6-84a31dfec176', 'variant-id-here', 'TaxFlow', 'Professional', 'Professional', 79.00, 'https://taxflow.lemonsqueezy.com/checkout/buy/8ce36460-1599-4916-a8b6-84a31dfec176'),
-('a7399038-8dc2-4cc7-b5f8-530ccce4f32a', 'variant-id-here', 'TaxFlow', 'Enterprise', 'Enterprise', 199.00, 'https://taxflow.lemonsqueezy.com/checkout/buy/a7399038-8dc2-4cc7-b5f8-530ccce4f32a');
-*/
+INSERT INTO public.lemon_squeezy_products (product_id, variant_id, product_name, variant_name, tier, price, checkout_url)
+VALUES
+  (
+    '8c2a1173-86c0-4f3d-9bd6-55c6eea44f08',
+    '8c2a1173-86c0-4f3d-9bd6-55c6eea44f08',
+    'TaxFlow',
+    'Basic',
+    'Pay Per Form',
+    4.00,
+    'https://taxflow.lemonsqueezy.com/checkout/buy/8c2a1173-86c0-4f3d-9bd6-55c6eea44f08'
+  ),
+  (
+    'a7399038-8dc2-4cc7-b5f8-530ccce4f32a',
+    'a7399038-8dc2-4cc7-b5f8-530ccce4f32a',
+    'TaxFlow',
+    'Professional',
+    'Professional',
+    79.00,
+    'https://taxflow.lemonsqueezy.com/checkout/buy/a7399038-8dc2-4cc7-b5f8-530ccce4f32a'
+  ),
+  (
+    '8ce36460-1599-4916-a8b6-84a31dfec176',
+    '8ce36460-1599-4916-a8b6-84a31dfec176',
+    'TaxFlow',
+    'Enterprise',
+    'Enterprise',
+    199.00,
+    'https://taxflow.lemonsqueezy.com/checkout/buy/8ce36460-1599-4916-a8b6-84a31dfec176'
+  )
+ON CONFLICT (variant_id)
+DO UPDATE SET
+  product_id = EXCLUDED.product_id,
+  product_name = EXCLUDED.product_name,
+  variant_name = EXCLUDED.variant_name,
+  tier = EXCLUDED.tier,
+  price = EXCLUDED.price,
+  checkout_url = EXCLUDED.checkout_url,
+  is_active = TRUE,
+  updated_at = NOW();
 
 -- Function to get checkout URL by tier
 CREATE OR REPLACE FUNCTION public.get_checkout_url(p_tier VARCHAR)
