@@ -1,56 +1,93 @@
+import { supabase } from '../../lib/supabase';
+
+type PricingPlan = {
+  name: string;
+  tier: 'Pay Per Form' | 'Professional' | 'Enterprise';
+  price: string;
+  period: string;
+  description: string;
+  features: string[];
+  cta: string;
+  popular: boolean;
+  fallbackCheckoutUrl: string;
+};
+
 export function PricingSection() {
-  const plans = [
+  const plans: PricingPlan[] = [
     {
-      name: 'Starter',
-      price: '0',
-      period: 'Free',
-      description: 'For small startups',
+      name: 'Basic',
+      tier: 'Pay Per Form',
+      price: '4',
+      period: 'month',
+      description: 'Best for starting out',
       features: [
-        'Up to 5 employees',
-        'Basic payroll processing',
+        'Pay per form',
         'W-2 tax forms',
-        'Basic financial reports',
+        'Basic payroll tools',
         'Email support'
       ],
-      cta: 'Start Free',
-      popular: false
+      cta: 'جرب 14 يوم مجاناً',
+      popular: false,
+      fallbackCheckoutUrl: 'https://taxflow.lemonsqueezy.com/checkout/buy/8c2a1173-86c0-4f3d-9bd6-55c6eea44f08',
     },
     {
       name: 'Professional',
-      price: '99',
-      period: 'monthly',
+      tier: 'Professional',
+      price: '79',
+      period: 'month',
       description: 'For growing companies',
       features: [
         'Up to 50 employees',
-        'Advanced payroll processing',
         'W-2 and W-3 tax forms',
         'Detailed financial reports',
-        'Phone and email support',
-        'Accounting system integration',
         'Task and report management'
       ],
-      cta: 'Subscribe Now',
-      popular: true
+      cta: 'جرب 14 يوم مجاناً',
+      popular: true,
+      fallbackCheckoutUrl: 'https://taxflow.lemonsqueezy.com/checkout/buy/a7399038-8dc2-4cc7-b5f8-530ccce4f32a',
     },
     {
       name: 'Enterprise',
-      price: '299',
-      period: 'monthly',
+      tier: 'Enterprise',
+      price: '199',
+      period: 'month',
       description: 'For large companies',
       features: [
         'Unlimited employees',
-        'Automated payroll processing',
         'All tax forms',
         'Custom financial reports',
-        '24/7 support',
-        'Advanced API integration',
-        'Advanced permission management',
-        'Dedicated team training'
+        '24/7 support'
       ],
-      cta: 'Contact Us',
-      popular: false
+      cta: 'جرب 14 يوم مجاناً',
+      popular: false,
+      fallbackCheckoutUrl: 'https://taxflow.lemonsqueezy.com/checkout/buy/8ce36460-1599-4916-a8b6-84a31dfec176',
     }
   ];
+
+  const openCheckout = async (plan: PricingPlan) => {
+    try {
+      const { data, error } = await supabase
+        .from('lemon_squeezy_products')
+        .select('checkout_url')
+        .eq('tier', plan.tier)
+        .eq('is_active', true)
+        .limit(1)
+        .maybeSingle();
+
+      if (error) {
+        throw error;
+      }
+
+      const checkoutUrl = data?.checkout_url || plan.fallbackCheckoutUrl;
+      if (!checkoutUrl) {
+        throw new Error('Missing checkout url');
+      }
+
+      window.location.href = checkoutUrl;
+    } catch {
+      window.location.href = plan.fallbackCheckoutUrl;
+    }
+  };
 
   return (
     <section className="py-20 px-6 bg-gradient-to-br from-slate-50 to-blue-50">
@@ -116,6 +153,7 @@ export function PricingSection() {
                 ))}
               </ul>
               <button
+                onClick={() => openCheckout(plan)}
                 className={`w-full py-4 rounded-xl font-bold transition-all ${
                   plan.popular
                     ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-lg hover:shadow-blue-500/25'

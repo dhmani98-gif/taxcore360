@@ -524,6 +524,25 @@ function App() {
 
   const totalGrossPayroll = useMemo(() => employees.reduce((sum, employee) => sum + employee.grossPay, 0), [employees]);
 
+  const trialBanner = useMemo(() => {
+    if (!supabaseUser?.is_trial_active || !supabaseUser.trial_ends_at) {
+      return null;
+    }
+
+    const endsAt = new Date(supabaseUser.trial_ends_at);
+    if (Number.isNaN(endsAt.getTime())) {
+      return null;
+    }
+
+    const msLeft = endsAt.getTime() - Date.now();
+    const daysLeft = Math.max(0, Math.ceil(msLeft / (1000 * 60 * 60 * 24)));
+
+    return {
+      daysLeft,
+      endsAtLabel: endsAt.toLocaleDateString('en-US'),
+    };
+  }, [supabaseUser?.is_trial_active, supabaseUser?.trial_ends_at]);
+
   const activeEmployees = useMemo(() => employees.filter((employee) => employee.status === "Active"), [employees]);
 
   const executiveTotals = useMemo(() => {
@@ -3028,6 +3047,33 @@ function App() {
                 </span>
               </div>
             </div>
+            {trialBanner ? (
+              <div className="mt-3 animate-fade-in rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] font-semibold text-amber-900">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <svg viewBox="0 0 24 24" className="h-4 w-4 text-amber-700" fill="none" stroke="currentColor" strokeWidth={2}>
+                      <path d="M12 6v6l4 2" />
+                      <path d="M8 2v3" />
+                      <path d="M16 2v3" />
+                      <path d="M7 6h10" />
+                      <circle cx="12" cy="14" r="8" />
+                    </svg>
+                    <span>
+                      تجربة مجانية فعّالة — باقي {trialBanner.daysLeft} يوم (تنتهي {trialBanner.endsAtLabel})
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setViewMode('subscriptions');
+                      navigate('/subscriptions');
+                    }}
+                    className="rounded-lg bg-amber-600 px-3 py-2 text-[12px] font-bold text-white shadow-sm hover:bg-amber-700"
+                  >
+                    ترقية الآن
+                  </button>
+                </div>
+              </div>
+            ) : null}
             {communicationBanner ? <p className="mt-3 animate-fade-in rounded-lg border border-blue-200/50 bg-blue-50 px-4 py-2 text-[12px] font-medium text-blue-700">{communicationBanner}</p> : null}
           </header>
 

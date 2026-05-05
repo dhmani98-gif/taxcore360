@@ -7,6 +7,9 @@ export type AuthUser = {
   full_name?: string;
   role: string;
   company_id?: string;
+  subscription_tier?: string;
+  is_trial_active?: boolean;
+  trial_ends_at?: string | null;
 };
 
 export type AuthResult = {
@@ -153,6 +156,9 @@ export const authService = {
           full_name: profile?.full_name || session.user.user_metadata?.full_name,
           role: profile?.role || 'Viewer',
           company_id: profile?.company_id,
+          subscription_tier: profile?.subscription_tier,
+          is_trial_active: profile?.is_trial_active,
+          trial_ends_at: profile?.trial_ends_at ?? null,
         },
       };
     } catch (error) {
@@ -253,6 +259,9 @@ export const authService = {
                 full_name: profile.full_name ?? session.user.user_metadata?.full_name,
                 role: profile.role || 'Viewer',
                 company_id: profile.company_id,
+                subscription_tier: profile.subscription_tier,
+                is_trial_active: profile.is_trial_active,
+                trial_ends_at: profile.trial_ends_at ?? null,
               });
             } catch (e) {
               console.error('Error fetching profile on auth state change:', e);
