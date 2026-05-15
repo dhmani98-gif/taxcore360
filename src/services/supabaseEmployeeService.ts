@@ -1,12 +1,10 @@
 import { supabase } from '../lib/supabase';
 
 export interface Employee {
-  id: string;
+  id: number;
   company_id: string;
-  employee_id: string;
   first_name: string;
   last_name: string;
-  email: string;
   ssn: string;
   department: string;
   job_title: string;
@@ -15,8 +13,8 @@ export interface Employee {
   address: string;
   city: string;
   state: string;
-  zip: string;
-  status: 'Active' | 'Inactive' | 'On Leave';
+  zip_code: string;
+  status: 'active' | 'inactive';
   created_at: string;
   updated_at: string;
 }

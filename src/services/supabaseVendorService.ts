@@ -1,20 +1,21 @@
 import { supabase } from '../lib/supabase';
 
 export interface Vendor {
-  id: string;
   company_id: string;
   vendor_id: string;
   legal_name: string;
+  address: string;
+  zip_code: string;
   email: string;
+  phone: string;
   tax_id_type: 'SSN' | 'EIN';
   tax_id: string;
   entity_type: 'Individual' | 'Partnership' | 'Corporation' | 'LLC';
   state: string;
-  zip: string;
-  address: string;
-  category: 'Consulting' | 'Professional Services' | 'Contractor' | 'Other';
-  tin_verification_status: 'Pending' | 'Verified' | 'Failed';
-  w9_status: 'Not Requested' | 'Requested' | 'Received' | 'Expired';
+  category: 'Consulting' | 'Design' | 'Development' | 'Legal' | 'Marketing' | 'Operations';
+  tin_verification: 'Unverified' | 'Verified' | 'Invalid';
+  onboarding_source: string;
+  w9_request_status: 'Not Requested' | 'Pending' | 'Completed' | 'Expired';
   created_at: string;
   updated_at: string;
 }
@@ -55,7 +56,7 @@ export const supabaseVendorService = {
   },
 
   // Create a new vendor
-  createVendor: async (vendor: Omit<Vendor, 'id' | 'created_at' | 'updated_at'>): Promise<{ data: Vendor | null; error: string | null }> => {
+  createVendor: async (vendor: Omit<Vendor, 'created_at' | 'updated_at'>): Promise<{ data: Vendor | null; error: string | null }> => {
     try {
       const { data, error } = await supabase
         .from('vendors')

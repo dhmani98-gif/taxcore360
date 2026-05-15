@@ -163,7 +163,7 @@ function App() {
         } else if (data) {
           // Convert Supabase employees to EmployeeRow format
           const employeeRows: EmployeeRow[] = data.map((emp) => ({
-            id: parseInt(emp.employee_id) || 0,
+            id: emp.id,
             firstName: emp.first_name,
             lastName: emp.last_name,
             fullName: `${emp.first_name} ${emp.last_name}`,
@@ -171,12 +171,12 @@ function App() {
             address: emp.address,
             city: emp.city,
             state: emp.state,
-            zipCode: emp.zip,
+            zipCode: emp.zip_code,
             department: emp.department,
             jobTitle: emp.job_title,
             hireDate: emp.hire_date,
             grossPay: emp.gross_pay,
-            status: emp.status as EmployeeStatus,
+            status: (emp.status === "active" ? "Active" : "Inactive") as EmployeeStatus,
           }));
           setEmployees(employeeRows);
         }
@@ -322,17 +322,17 @@ function App() {
             vendorId: vendor.vendor_id,
             legalName: vendor.legal_name,
             address: vendor.address,
-            zipCode: vendor.zip,
+            zipCode: vendor.zip_code,
             email: vendor.email,
-            phone: "",
+            phone: vendor.phone,
             state: vendor.state,
             category: vendor.category as VendorCategory,
             taxIdType: vendor.tax_id_type,
             taxId: vendor.tax_id,
             entityType: vendor.entity_type,
-            tinVerification: vendor.tin_verification_status === "Verified" ? "Verified" : "Invalid",
-            onboardingSource: "Manual",
-            w9RequestStatus: vendor.w9_status === "Received" ? "Signed" : "Not Requested",
+            tinVerification: vendor.tin_verification === "Verified" ? "Verified" : vendor.tin_verification === "Invalid" ? "Invalid" : "Unverified",
+            onboardingSource: vendor.onboarding_source ?? "Manual",
+            w9RequestStatus: vendor.w9_request_status === "Completed" ? "Signed" : vendor.w9_request_status,
           }));
           setVendors(vendorRows);
         }
@@ -1505,10 +1505,8 @@ function App() {
     if (supabaseUser?.company_id) {
       const { data, error } = await supabaseEmployeeService.createEmployee({
         company_id: supabaseUser.company_id,
-        employee_id: Date.now().toString(),
         first_name: firstName,
         last_name: lastName,
-        email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@company.com`,
         ssn: employeeForm.ssn.trim(),
         department: employeeForm.department.trim(),
         job_title: employeeForm.jobTitle.trim(),
@@ -1517,8 +1515,8 @@ function App() {
         address: employeeForm.address.trim(),
         city: employeeForm.city.trim(),
         state: employeeForm.state.trim(),
-        zip: employeeForm.zipCode.trim(),
-        status: "Active",
+        zip_code: employeeForm.zipCode.trim(),
+        status: "active",
       });
 
       if (error) {
@@ -1529,7 +1527,7 @@ function App() {
       if (data) {
         // Convert to EmployeeRow format and add to local state
         const newEmployee: EmployeeRow = {
-          id: parseInt(data.employee_id) || 0,
+          id: data.id,
           firstName: data.first_name,
           lastName: data.last_name,
           fullName: `${data.first_name} ${data.last_name}`,
@@ -1537,12 +1535,12 @@ function App() {
           address: data.address,
           city: data.city,
           state: data.state,
-          zipCode: data.zip,
+          zipCode: data.zip_code,
           department: data.department,
           jobTitle: data.job_title,
           hireDate: data.hire_date,
           grossPay: data.gross_pay,
-          status: data.status as EmployeeStatus,
+          status: (data.status === "active" ? "Active" : "Inactive") as EmployeeStatus,
         };
         setEmployees((prev) => [...prev, newEmployee]);
       }
@@ -1615,15 +1613,17 @@ function App() {
         vendor_id: vendorId,
         legal_name: legalName,
         address: vendorForm.address.trim(),
-        zip: zipCode,
+        zip_code: zipCode,
         email: vendorForm.email.trim(),
+        phone: vendorForm.phone.trim(),
         state: vendorForm.state,
-        category: vendorForm.category as 'Consulting' | 'Professional Services' | 'Contractor' | 'Other',
+        category: vendorForm.category as any,
         tax_id_type: vendorForm.taxIdType,
         tax_id: taxId,
         entity_type: vendorForm.entityType,
-        tin_verification_status: isTinMatchedToVendorName({ legalName, taxIdType: vendorForm.taxIdType, taxId }) ? "Verified" : "Pending",
-        w9_status: "Not Requested",
+        tin_verification: isTinMatchedToVendorName({ legalName, taxIdType: vendorForm.taxIdType, taxId }) ? "Verified" : "Unverified",
+        onboarding_source: "Manual",
+        w9_request_status: "Not Requested",
       });
 
       if (error) {
@@ -1639,17 +1639,17 @@ function App() {
           vendorId: data.vendor_id,
           legalName: data.legal_name,
           address: data.address,
-          zipCode: data.zip,
+          zipCode: data.zip_code,
           email: data.email,
-          phone: "",
+          phone: data.phone,
           state: data.state,
           category: data.category as VendorCategory,
           taxIdType: data.tax_id_type,
           taxId: data.tax_id,
           entityType: data.entity_type,
-          tinVerification: data.tin_verification_status === "Verified" ? "Verified" : "Invalid",
-          onboardingSource: "Manual",
-          w9RequestStatus: data.w9_status === "Received" ? "Signed" : "Not Requested",
+          tinVerification: data.tin_verification === "Verified" ? "Verified" : data.tin_verification === "Invalid" ? "Invalid" : "Unverified",
+          onboardingSource: data.onboarding_source ?? "Manual",
+          w9RequestStatus: data.w9_request_status === "Completed" ? "Signed" : data.w9_request_status,
         };
         setVendors((prev) => [...prev, newVendor]);
       }
